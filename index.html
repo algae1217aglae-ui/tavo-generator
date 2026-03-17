@@ -10,6 +10,710 @@
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone@7.23.2/babel.min.js"></script>
-  <script type="text/babel" data-type="module" src="./tavo-App.js"></script>
+  <script type="text/babel">
+const { useState, useCallback, useMemo, memo } = React;
+
+
+/* ══════════════════════════ i18n ══════════════════════════ */
+const T = {
+  "zh-TW": {
+    title: "Tavo 角色卡生成器", steps: ["API 設定", "角色基礎", "角色細節", "世界觀", "NPC 設定", "基調與開場", "生成與匯出"],
+    apiProvider: "API 供應商", apiKey: "API 金鑰", apiKeyPh: "輸入你的 API 金鑰（僅本地使用，不會上傳）",
+    model: "模型名稱", modelPh: "例如：claude-sonnet-4-20250514", customEndpoint: "自訂端點 URL", language: "輸出語言",
+    corsMode:"連線方式",corsDirect:"直連",corsBuiltin:"內建代理",corsCustom:"自訂代理",corsProxyPh:"輸入你的 CORS 代理 URL",corsNote:"⚠ 此供應商從瀏覽器直連會被 CORS 擋住，請選擇代理",corsBuiltinNote:"✓ 使用私人代理（lucky-hall worker），穩定且安全",
+    charName: "角色姓名", charNamePh: "留空則由 AI 根據命名風格生成", charGender: "性別",
+    genderOpts: ["男", "女", "非二元", "自訂"], customGender: "自訂性別",
+    charAge: "年齡", charAgePh: "例如：27、約三百歲、不明", charRace: "種族",
+    raceOpts: { human: "人類", vampire: "吸血鬼", werewolf: "狼人", elf: "精靈", demon: "惡魔", angel: "天使", dragon: "龍族", fox: "妖狐", ghost: "鬼", halfbeast: "半獸人", custom: "自訂" },
+    customRace: "自訂種族", personality: "性格標籤",
+    personalityTags: ["傲嬌", "冷酷", "面熱心冷", "成熟", "可愛", "腹黑", "天然呆", "病嬌", "元氣", "溫柔", "毒舌", "中二", "高冷", "慵懶", "忠犬", "悶騷", "陰鬱", "開朗", "狡猾", "正直"],
+    customTagPh: "自訂標籤（Enter 新增）",
+    background: "角色過往", bgAuto: "AI 自由發揮", bgCustom: "自行填寫概述，AI 補充", bgPh: "輸入角色過往的概述…",
+    romance: "感情史", romanceYes: "有", romanceNo: "無", romanceDetailPh: "簡述感情經歷（選填）…",
+    specialMech: "角色特殊機制（選填）", specialMechPh: "例如：需要隱藏的秘密、生理弱點、特殊能力…",
+    charExtra: "補充資訊（選填）", charExtraPh: "任何想加入提示詞的額外描述，例如：{{char}} 對 {{user}} 有特殊感情…",
+    userRelation: "與 User 的初始關係",
+    relationOpts: { stranger: "陌生人", acquaintance: "點頭之交", colleague: "同事", friend: "朋友", rival: "對手", employer: "雇主/委託人", custom: "自訂" },
+    customRelation: "自訂關係",
+    worldStyle: "世界觀風格",
+    worldTags: ["現代", "克蘇魯", "科幻", "玄幻", "奇幻", "末日", "賽博龐克", "蒸汽龐克", "中世紀", "武俠", "都市異能", "校園", "維多利亞", "哥德", "軍事", "海盜", "太空歌劇"],
+    customWorldPh: "自訂世界觀標籤（Enter 新增）", namingStyle: "命名風格",
+    namingOpts: { cn: "中式", jp: "日式", west: "西歐式", nordic: "北歐式", ru: "俄式", arabic: "阿拉伯式", mixed: "混合", custom: "自訂" },
+    customNaming: "自訂命名風格", countryCount: "國家數量", cityCount: "城市數量（每國）",
+    includeRaces: "包含種族體系", raceSystem: "種族選項",
+    worldRaceTags: ["吸血鬼", "狼人", "精靈", "矮人", "鬼", "狐狸精", "天狗", "雪女", "龍族", "惡魔", "天使", "獸人", "巨人", "妖精", "不死族"],
+    npcTitle: "NPC 設定", enemies: "仇人", friends: "朋友", family: "家人",
+    father: "父親", mother: "母親", brother: "兄弟", sister: "姐妹",
+    maleCount: "男", femaleCount: "女", npcPreview: "NPC 預覽 — 點擊勾選核心角色",
+    coreLabel: "核心", simpleLabel: "簡略", noNpc: "尚未新增任何 NPC",
+    toneTitle: "敘事基調",
+    toneTags: ["沉重", "輕鬆", "黑暗", "溫暖", "懸疑", "浪漫", "詼諧", "悲壯", "日常", "冒險", "荒誕", "治癒", "緊張", "哲學"],
+    customTonePh: "自訂基調標籤（Enter 新增）",
+    firstMes: "開場白", fmAuto: "AI 自由發揮", fmCustom: "自訂劇情開場", fmPh: "描述你想要的開場情境…",
+    entryMode: "世界書條目模式", entryAllConst: "全部常駐", entryAuto: "工具協助（常駐 + 關鍵字觸發）",
+    generate: "開始生成", download: "下載 JSON", restart: "重新開始",
+    back: "上一步", next: "下一步",
+    progressChar: "正在生成角色描述…", progressWorld: "正在生成世界觀…", progressCountry: "正在生成國家設定",
+    progressRace: "正在生成種族體系…", progressNpc: "正在生成 NPC", progressFirst: "正在生成開場白…",
+    progressAssemble: "正在組裝角色卡…", progressDone: "生成完成！",
+    errorApi: "API 呼叫失敗", apiNeedKey: "請先填寫 API 金鑰和模型名稱",
+    readyMsg: "準備生成角色卡", themeLight: "淺色", themeDark: "深色",
+    modelHint: "常用模型", enemyM: "仇人♂", enemyF: "仇人♀", friendM: "朋友♂", friendF: "朋友♀",
+  },
+  "zh-CN": {
+    title: "Tavo 角色卡生成器", steps: ["API 设定", "角色基础", "角色细节", "世界观", "NPC 设定", "基调与开场", "生成与导出"],
+    apiProvider: "API 供应商", apiKey: "API 密钥", apiKeyPh: "输入你的 API 密钥（仅本地使用）",
+    model: "模型名称", modelPh: "例如：claude-sonnet-4-20250514", customEndpoint: "自定义端点 URL", language: "输出语言",
+    corsMode:"连线方式",corsDirect:"直连",corsBuiltin:"内建代理",corsCustom:"自定义代理",corsProxyPh:"输入你的 CORS 代理 URL",corsNote:"⚠ 此供应商从浏览器直连会被 CORS 挡住，请选择代理",corsBuiltinNote:"✓ 使用私人代理（lucky-hall worker），稳定且安全",
+    charName: "角色姓名", charNamePh: "留空则由 AI 生成", charGender: "性别",
+    genderOpts: ["男", "女", "非二元", "自定义"], customGender: "自定义性别",
+    charAge: "年龄", charAgePh: "例如：27、约三百岁", charRace: "种族",
+    raceOpts: { human: "人类", vampire: "吸血鬼", werewolf: "狼人", elf: "精灵", demon: "恶魔", angel: "天使", dragon: "龙族", fox: "妖狐", ghost: "鬼", halfbeast: "半兽人", custom: "自定义" },
+    customRace: "自定义种族", personality: "性格标签",
+    personalityTags: ["傲娇", "冷酷", "面热心冷", "成熟", "可爱", "腹黑", "天然呆", "病娇", "元气", "温柔", "毒舌", "中二", "高冷", "慵懒", "忠犬", "闷骚", "阴郁", "开朗", "狡猾", "正直"],
+    customTagPh: "自定义标签（Enter 新增）",
+    background: "角色过往", bgAuto: "AI 自由发挥", bgCustom: "填写概述，AI 补充", bgPh: "输入角色过往概述…",
+    romance: "感情史", romanceYes: "有", romanceNo: "无", romanceDetailPh: "简述感情经历…",
+    specialMech: "角色特殊机制（选填）", specialMechPh: "例如：秘密、弱点、能力…",
+    charExtra: "补充信息（选填）", charExtraPh: "任何想加入提示词的额外描述，例如：{{char}} 对 {{user}} 有特殊感情…",
+    userRelation: "与 User 的初始关系",
+    relationOpts: { stranger: "陌生人", acquaintance: "点头之交", colleague: "同事", friend: "朋友", rival: "对手", employer: "雇主/委托人", custom: "自定义" },
+    customRelation: "自定义关系",
+    worldStyle: "世界观风格",
+    worldTags: ["现代", "克苏鲁", "科幻", "玄幻", "奇幻", "末日", "赛博朋克", "蒸汽朋克", "中世纪", "武侠", "都市异能", "校园", "维多利亚", "哥特", "军事", "海盗", "太空歌剧"],
+    customWorldPh: "自定义世界观标签（Enter 新增）", namingStyle: "命名风格",
+    namingOpts: { cn: "中式", jp: "日式", west: "西欧式", nordic: "北欧式", ru: "俄式", arabic: "阿拉伯式", mixed: "混合", custom: "自定义" },
+    customNaming: "自定义命名风格", countryCount: "国家数量", cityCount: "城市数量（每国）",
+    includeRaces: "包含种族体系", raceSystem: "种族选项",
+    worldRaceTags: ["吸血鬼", "狼人", "精灵", "矮人", "鬼", "狐狸精", "天狗", "雪女", "龙族", "恶魔", "天使", "兽人", "巨人", "妖精", "不死族"],
+    npcTitle: "NPC 设定", enemies: "仇人", friends: "朋友", family: "家人",
+    father: "父亲", mother: "母亲", brother: "兄弟", sister: "姐妹",
+    maleCount: "男", femaleCount: "女", npcPreview: "NPC 预览 — 点击勾选核心角色",
+    coreLabel: "核心", simpleLabel: "简略", noNpc: "尚未新增任何 NPC",
+    toneTitle: "叙事基调",
+    toneTags: ["沉重", "轻松", "黑暗", "温暖", "悬疑", "浪漫", "诙谐", "悲壮", "日常", "冒险", "荒诞", "治愈", "紧张", "哲学"],
+    customTonePh: "自定义基调标签（Enter 新增）",
+    firstMes: "开场白", fmAuto: "AI 自由发挥", fmCustom: "自定义剧情开场", fmPh: "描述你想要的开场情境…",
+    entryMode: "世界书条目模式", entryAllConst: "全部常驻", entryAuto: "工具协助（常驻 + 关键字触发）",
+    generate: "开始生成", download: "下载 JSON", restart: "重新开始",
+    back: "上一步", next: "下一步",
+    progressChar: "正在生成角色描述…", progressWorld: "正在生成世界观…", progressCountry: "正在生成国家设定",
+    progressRace: "正在生成种族体系…", progressNpc: "正在生成 NPC", progressFirst: "正在生成开场白…",
+    progressAssemble: "正在组装角色卡…", progressDone: "生成完成！",
+    errorApi: "API 调用失败", apiNeedKey: "请先填写 API 密钥和模型名称",
+    readyMsg: "准备生成角色卡", themeLight: "浅色", themeDark: "深色",
+    modelHint: "常用模型", enemyM: "仇人♂", enemyF: "仇人♀", friendM: "朋友♂", friendF: "朋友♀",
+  },
+  en: {
+    title: "Tavo Card Generator", steps: ["API Setup", "Character", "Details", "World", "NPCs", "Tone & Intro", "Generate"],
+    apiProvider: "API Provider", apiKey: "API Key", apiKeyPh: "Enter your API key (local only)", model: "Model", modelPh: "e.g. claude-sonnet-4-20250514",
+    customEndpoint: "Custom Endpoint URL", language: "Output Language",
+    corsMode:"Connection",corsDirect:"Direct",corsBuiltin:"Built-in Proxy",corsCustom:"Custom Proxy",corsProxyPh:"Enter your CORS proxy URL",corsNote:"⚠ This provider needs a proxy for browser requests (CORS blocked)",corsBuiltinNote:"✓ Uses private proxy (lucky-hall worker), stable and safe",
+    charName: "Name", charNamePh: "Leave empty for AI", charGender: "Gender",
+    genderOpts: ["Male", "Female", "Non-binary", "Custom"], customGender: "Custom Gender",
+    charAge: "Age", charAgePh: "e.g. 27, ~300 years", charRace: "Race",
+    raceOpts: { human: "Human", vampire: "Vampire", werewolf: "Werewolf", elf: "Elf", demon: "Demon", angel: "Angel", dragon: "Dragon", fox: "Fox Spirit", ghost: "Ghost", halfbeast: "Half-beast", custom: "Custom" },
+    customRace: "Custom Race", personality: "Personality",
+    personalityTags: ["Tsundere", "Cold", "Warm Outside Cold Inside", "Mature", "Cute", "Scheming", "Airhead", "Yandere", "Energetic", "Gentle", "Sharp-tongued", "Chuuni", "Aloof", "Lazy", "Loyal", "Reserved Passion", "Gloomy", "Cheerful", "Cunning", "Righteous"],
+    customTagPh: "Custom tag (Enter)",
+    background: "Background", bgAuto: "AI generates", bgCustom: "Outline + AI", bgPh: "Enter background outline…",
+    romance: "Romance", romanceYes: "Yes", romanceNo: "No", romanceDetailPh: "Brief romance history…",
+    specialMech: "Special Mechanisms", specialMechPh: "e.g. secrets, weaknesses…",
+    charExtra: "Extra Info (optional)", charExtraPh: "Any extra details for the prompt, e.g. {{char}} has special feelings for {{user}}…",
+    userRelation: "Relationship with User",
+    relationOpts: { stranger: "Stranger", acquaintance: "Acquaintance", colleague: "Colleague", friend: "Friend", rival: "Rival", employer: "Employer", custom: "Custom" },
+    customRelation: "Custom",
+    worldStyle: "World Style",
+    worldTags: ["Modern", "Cthulhu", "Sci-fi", "Xianxia", "Fantasy", "Post-apocalyptic", "Cyberpunk", "Steampunk", "Medieval", "Wuxia", "Urban Supernatural", "Campus", "Victorian", "Gothic", "Military", "Pirate", "Space Opera"],
+    customWorldPh: "Custom tag (Enter)", namingStyle: "Naming Style",
+    namingOpts: { cn: "Chinese", jp: "Japanese", west: "Western", nordic: "Nordic", ru: "Russian", arabic: "Arabic", mixed: "Mixed", custom: "Custom" },
+    customNaming: "Custom", countryCount: "Countries", cityCount: "Cities/Country",
+    includeRaces: "Include Races", raceSystem: "Races",
+    worldRaceTags: ["Vampire", "Werewolf", "Elf", "Dwarf", "Ghost", "Fox Spirit", "Tengu", "Yuki-onna", "Dragon", "Demon", "Angel", "Orc", "Giant", "Fairy", "Undead"],
+    npcTitle: "NPCs", enemies: "Enemies", friends: "Friends", family: "Family",
+    father: "Father", mother: "Mother", brother: "Brothers", sister: "Sisters",
+    maleCount: "M", femaleCount: "F", npcPreview: "NPC Preview — click to mark core",
+    coreLabel: "Core", simpleLabel: "Simple", noNpc: "No NPCs yet",
+    toneTitle: "Tone",
+    toneTags: ["Heavy", "Light", "Dark", "Warm", "Suspenseful", "Romantic", "Humorous", "Tragic", "Slice of Life", "Adventure", "Absurd", "Healing", "Tense", "Philosophical"],
+    customTonePh: "Custom tone (Enter)",
+    firstMes: "Opening", fmAuto: "AI generates", fmCustom: "Custom scenario", fmPh: "Describe opening…",
+    entryMode: "Entry Mode", entryAllConst: "All Constant", entryAuto: "Auto (Const + Keyword)",
+    generate: "Generate", download: "Download JSON", restart: "Start Over",
+    back: "Back", next: "Next",
+    progressChar: "Generating character…", progressWorld: "Generating world…", progressCountry: "Generating countries",
+    progressRace: "Generating races…", progressNpc: "Generating NPC", progressFirst: "Generating opening…",
+    progressAssemble: "Assembling…", progressDone: "Done!",
+    errorApi: "API failed", apiNeedKey: "API key and model required",
+    readyMsg: "Ready to generate", themeLight: "Light", themeDark: "Dark",
+    modelHint: "Models", enemyM: "Enemy♂", enemyF: "Enemy♀", friendM: "Friend♂", friendF: "Friend♀",
+  },
+};
+
+/* ══════════════════════ Providers ══════════════════════ */
+const PROVIDERS = {
+  anthropic:{label:"Anthropic",endpoint:"https://api.anthropic.com/v1/messages",models:["claude-sonnet-4-6","claude-opus-4-6","claude-haiku-4-5-20251001"],corsOk:true},
+  deepseek:{label:"DeepSeek",endpoint:"https://api.deepseek.com/chat/completions",models:["deepseek-chat","deepseek-reasoner"],corsOk:false},
+  grok:{label:"xAI Grok",endpoint:"https://api.x.ai/v1/chat/completions",models:["grok-4.20-beta-0309-non-reasoning","grok-4.20-beta-0309-reasoning","grok-4.20-multi-agent-beta-0309"],corsOk:false},
+  openai:{label:"OpenAI",endpoint:"https://api.openai.com/v1/chat/completions",models:["gpt-4o","gpt-4o-mini","o3-mini"],corsOk:false},
+  google:{label:"Gemini",endpoint:null,models:["gemini-3.1-pro-preview","gemini-3-flash-preview"],corsOk:true},
+  custom:{label:"Custom",endpoint:null,models:[],corsOk:true},
+};
+/* ══════════════════════ API Call ══════════════════════ */
+function makeUrl(url, corsMode, corsProxy) {
+  if (corsMode === "builtin") return "https://lucky-hall-7699.windmusic1217.workers.dev/" + url;
+  if (corsMode === "custom" && corsProxy) {
+    const p = corsProxy.replace(/\/+$/, "");
+    return p.includes("?") ? p + encodeURIComponent(url) : p + "/" + url;
+  }
+  return url;
+}
+
+async function doFetch(url, opts, corsMode, corsProxy) {
+  const primary = makeUrl(url, corsMode, corsProxy);
+  try {
+    const res = await fetch(primary, opts);
+    return res;
+  } catch (err) {
+
+    throw new Error(corsMode === "direct"
+      ? "Failed to fetch — 此供應商可能不支援瀏覽器直連（CORS），請在 API 設定中切換為「內建代理」或「自訂代理」"
+      : "Failed to fetch — 代理連線失敗，請嘗試其他代理或自訂代理");
+  }
+}
+
+async function callAI(cfg, prompt, maxTokens = 8192) {
+  const { provider, apiKey, model, customEndpoint, corsMode, corsProxy } = cfg;
+  try {
+    let res, data;
+    if (provider === "anthropic") {
+      res = await doFetch(PROVIDERS.anthropic.endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
+        body: JSON.stringify({ model, max_tokens: maxTokens, messages: [{ role: "user", content: prompt }] }),
+      }, corsMode, corsProxy);
+      data = await res.json();
+      if (data.error) throw new Error(data.error.message);
+      return data.content[0].text;
+    }
+    if (provider === "google") {
+      const base = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      res = await doFetch(base, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { maxOutputTokens: maxTokens } }) }, corsMode, corsProxy);
+      data = await res.json();
+      if (data.error) throw new Error(data.error.message);
+      return data.candidates[0].content.parts[0].text;
+    }
+    const endpoint = provider === "custom" ? customEndpoint : PROVIDERS[provider]?.endpoint;
+    if (!endpoint) throw new Error("No endpoint");
+    res = await doFetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({ model, messages: [{ role: "user", content: prompt }], max_tokens: maxTokens }),
+    }, corsMode, corsProxy);
+    data = await res.json();
+    if (data.error) throw new Error(typeof data.error === "string" ? data.error : data.error?.message || JSON.stringify(data.error));
+    return data.choices?.[0]?.message?.content || "";
+  } catch (e) { throw new Error(`API Error: ${e.message}`); }
+}
+
+/* ══════════════════ Prompts ══════════════════ */
+const L = (l) => l === "en" ? "English" : l === "zh-CN" ? "Simplified Chinese" : "Traditional Chinese";
+
+const _modern = ["現代","现代","Modern","校園","校园","Campus","日常","Slice of Life","都市異能","都市异能","Urban Supernatural"];
+const isModern = (tags) => tags.some(t => _modern.includes(t));
+
+function buildCharPrompt(s) {
+  const p = [...s.personalityTags, ...s.customPersonalityTags].join("、");
+  const bg = s.backgroundMode === "auto" ? "由你自由發揮" : `概述：\n${s.backgroundText}`;
+  const rm = s.hasRomance ? (s.romanceDetails || "有感情經歷，自由發揮") : "無";
+  const relMap = { stranger: "陌生人", acquaintance: "點頭之交", colleague: "同事", friend: "朋友", rival: "對手", employer: "雇主" };
+  const rel = s.userRelationship === "custom" ? s.customRelationship : (relMap[s.userRelationship] || s.userRelationship);
+  const mod = isModern([...s.worldStyleTags, ...s.customWorldTags]);
+  return `You are a master character writer for roleplay cards (Tavo/SillyTavern). Write in ${L(s.language)}.
+
+Generate a complete character profile in YAML. Parameters:
+- Name: ${s.charName || "(generate based on naming style: " + s.namingStyle + ")"}
+- Gender: ${s.charGender === "custom" ? s.customGenderText : s.charGender} (CRITICAL: strictly follow this gender in ALL descriptions, pronouns, and writing)
+- Age: ${s.charAge || "decide"} | Race: ${s.charRace === "custom" ? s.customRaceText : s.charRace}
+- Personality: ${p || "自由發揮"} | Background: ${bg}
+- Romance: ${rm} | Special: ${s.specialMechanisms || "無"}
+- Relationship with {{user}}: ${rel}
+${s.charExtra ? `- Additional notes: ${s.charExtra}` : ""}
+
+Wrap in <character_info:{{char}}>. YAML sections: 基本資料, 外貌與體態, 性格 (LIVING PROSE with anecdotes), 語癖與說話習慣 (with dialogue examples), 興趣愛好, 童年與過往.
+Use > for prose, quotes for short values. THREE-DIMENSIONAL with flaws and charm.
+
+CRITICAL WORLD RULES:
+- The character's 居住地/國籍 must include a specific FICTIONAL city name and country name.
+- Do NOT use real-world country or city names (no Tokyo, New York, Paris, etc.) unless the user explicitly wrote them in their input above.
+${mod ? "- This is a MODERN/DAILY setting: use NORMAL realistic-sounding fictional names (e.g. 槐安市、楓橋鎮), NOT fantastical or sci-fi names. Keep everything grounded." : "- Create distinctive fictional names fitting the world style."}
+Output ONLY the YAML inside the tags.`;
+}
+
+function buildWorldPrompt(s, charYaml) {
+  const styles = [...s.worldStyleTags, ...s.customWorldTags].join("、");
+  const nm = { cn: "中式", jp: "日式", west: "西歐式", nordic: "北歐式", ru: "俄式", arabic: "阿拉伯式", mixed: "混合" };
+  const mod = isModern([...s.worldStyleTags, ...s.customWorldTags]);
+  const locMatch = charYaml?.match(/居住地[：:]\s*"?([^"\n]+)/);
+  const charLoc = locMatch ? locMatch[1].trim() : null;
+  return `Worldbuilder. Write in ${L(s.language)}. Generate world overview in YAML.
+Style: ${styles} | Naming: ${s.namingStyle === "custom" ? s.customNamingText : (nm[s.namingStyle] || s.namingStyle)}
+Countries: ${s.countryCount}, Cities/country: ${s.cityCount}
+${charLoc ? `IMPORTANT: The main character lives in「${charLoc}」. This location MUST exist in the world.` : ""}
+
+RULES:
+- Wrap in <世界觀>. Include: 世界總覽 (name, era, geography, tech), history, systems, dynamics.
+- Do NOT use real-world names unless user specified them.
+${mod ? "- MODERN/DAILY setting: keep everything grounded, realistic. Normal city names, no fantastical elements. Focus on everyday society." : "- Create distinctive atmosphere and terminology fitting the genre."}
+Output ONLY YAML.`;
+}
+
+function buildCountryPrompt(s, world, i, charYaml) {
+  const nm = { cn: "中式", jp: "日式", west: "西歐式", nordic: "北歐式", ru: "俄式", arabic: "阿拉伯式", mixed: "混合" };
+  const mod = isModern([...s.worldStyleTags, ...s.customWorldTags]);
+  const locMatch = charYaml?.match(/居住地[：:]\s*"?([^"\n]+)/);
+  const charLoc = locMatch ? locMatch[1].trim() : null;
+  return `Worldbuilder. Write in ${L(s.language)}. Generate country #${i + 1}/${s.countryCount}.
+WORLD:\n${world}\nNaming: ${s.namingStyle === "custom" ? s.customNamingText : (nm[s.namingStyle] || s.namingStyle)}, Cities: ${s.cityCount}
+${i === 0 && charLoc ? `IMPORTANT: Include the main character's home「${charLoc}」as one of the cities in this country.` : ""}
+Wrap in tag with country name. YAML: 居民命名風格, 地理, 人口, 首都, 政府, 產業, 城市結構, 對外關係, 文化特色. DISTINCT.
+Do NOT use real-world names.${mod ? " Keep names normal and realistic." : ""} Output ONLY YAML.`;
+}
+
+function buildRacePrompt(s, world, races) {
+  return `Worldbuilder. Write in ${L(s.language)}. Generate race entries.
+WORLD:\n${world.substring(0, 2000)}\nRACES: ${races.join(", ")}
+Each race in own tag. YAML: 源流, 外觀與偽裝, 融入程度, 聚集地, 生活方式, 日常困擾 (humorous), 群組名言.
+Also: <特殊種族> overview + <跨種族軼事>. Output ONLY YAML.`;
+}
+
+function buildNpcPrompt(s, world, charY, type, spec, isCore) {
+  const d = isCore
+    ? "FULL: 基本資料, 外貌與體態, 性格 (anecdotes), 語癖 (dialogue), 與{{char}}的關係 (memories). Rich prose."
+    : "BRIEF: 基本資料, 外貌 (2-3 sentences), 性格 (1 paragraph), 與{{char}}的關係 (2-3 sentences).";
+  return `Character writer. Write in ${L(s.language)}. Generate NPC.
+WORLD: ${world.substring(0, 1500)}\nMAIN CHAR: ${charY.substring(0, 1500)}
+NPC: ${type} (${spec}) | Detail: ${d}
+NPC must live in the SAME world. Use locations from the world setting.
+Wrap in <character_info:NPC名字>. YAML. Distinct voice. Output ONLY YAML.`;
+}
+
+function buildFirstMesPrompt(s, charY, world) {
+  const tones = [...s.toneTags, ...s.customToneTags].join("、");
+  const inst = s.firstMesMode === "auto" ? "自由發揮引人入勝的開場" : `基於：\n${s.firstMesText}`;
+  return `Narrative writer. Write in ${L(s.language)}. Generate opening message.
+CHAR: ${charY.substring(0, 2000)}\nWORLD: ${world.substring(0, 1500)}\nTONE: ${tones}\n${inst}
+Third person for char, second for {{user}}. Vivid scene using locations FROM the world setting. 400-800 chars. Use {{user}}/{{char}}. Output ONLY narrative.`;
+}
+
+/* ══════════════════ Assembler ══════════════════ */
+function makeExt() {
+  return { selectiveLogic: 0, position: 0, depth: 4, role: 0, match_whole_words: true, probability: 100, useProbability: true, sticky: 0, cooldown: 0, delay: 0, exclude_recursion: false, prevent_recursion: false, delay_until_recursion: false, group: "", group_override: false, group_weight: 100, use_group_scoring: false, scan_depth: 2, case_sensitive: false, automation_id: "", vectorized: false };
+}
+function assemble(name, desc, firstMes, we, tone) {
+  const entries = []; let id = 0, di = 1;
+  entries.push({ keys: [], content: `【故事基調】：${tone}`, extensions: makeExt(), enabled: true, use_regex: false, insertion_order: 100, id: id++, name: "✏️故事基調，可以自己改", comment: "✏️故事基調，可以自己改", selective: false, case_sensitive: false, constant: true, position: "before_char", display_index: di++ });
+  we.forEach((e) => { entries.push({ keys: e.keys || [], content: e.content, extensions: makeExt(), enabled: true, use_regex: false, insertion_order: 100 - di, id: id++, name: e.name, comment: e.name, selective: e.selective || false, case_sensitive: false, constant: !e.selective, position: "before_char", display_index: di++ }); });
+  return { spec: "chara_card_v3", spec_version: "3.0", data: { avatar: "", name, description: desc, first_mes: firstMes, personality: "", scenario: "", mes_example: "", creator_notes: "", system_prompt: "", post_history_instructions: "", alternate_greetings: null, character_book: { name: "", entries }, tags: [], creator: "", character_version: "", nickname: "", creator_notes_multilingual: {}, source: [], group_only_greetings: [], creation_date: Date.now(), modification_date: Date.now(), extensions: {} } };
+}
+
+/* ══════════════════ Components ══════════════════ */
+
+const VarBtn = ({ onInsert }) => (
+  <div style={{ display: "flex", gap: 4, marginTop: 4 }}>
+    <button type="button" onClick={() => onInsert("{{user}}")} className="tg-mhb">{"{{user}}"}</button>
+    <button type="button" onClick={() => onInsert("{{char}}")} className="tg-mhb">{"{{char}}"}</button>
+  </div>
+);
+
+function insertAtCursor(setter, currentValue, text) {
+  setter(currentValue + text);
+}
+
+const TagSelector = memo(function TagSelector({ tags, selected, onToggle, customTags, onAddCustom, onRemoveCustom, placeholder }) {
+  const [input, setInput] = useState("");
+  return (<div>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 4 }}>
+      {tags.map(tag => <button key={tag} onClick={() => onToggle(tag)} className={`tg-chip ${selected.includes(tag) ? "tg-chip-on" : ""}`}>{tag}</button>)}
+      {customTags.map(tag => <button key={tag} onClick={() => onRemoveCustom(tag)} className="tg-chip tg-chip-custom">{tag} ×</button>)}
+    </div>
+    {placeholder && <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && input.trim()) { e.preventDefault(); onAddCustom(input.trim()); setInput(""); } }} placeholder={placeholder} className="tg-input" style={{ marginTop: 4 }} />}
+  </div>);
+});
+
+const NumInput = memo(function NumInput({ value, onChange, min = 0, max = 20, label }) {
+  return (<div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+    {label && <span className="tg-label-sm">{label}</span>}
+    <div className="tg-num"><button onClick={() => onChange(Math.max(min, value - 1))}>−</button><span>{value}</span><button onClick={() => onChange(Math.min(max, value + 1))}>+</button></div>
+  </div>);
+});
+
+const Section = ({ title, children }) => (<div className="tg-sec"><div className="tg-sec-t"><div className="tg-sec-l" /><span>{title}</span><div className="tg-sec-l" /></div>{children}</div>);
+const Toggle = memo(({ checked, onChange, label }) => (<div className="tg-tog" onClick={() => onChange(!checked)}><div className={`tg-tog-tr ${checked ? "on" : "off"}`}><div className="tg-tog-th" style={{ left: checked ? 18 : 2 }} /></div><span style={{ fontSize: 13, color: "var(--t2)" }}>{label}</span></div>));
+
+/* ══════════════════════ MAIN ══════════════════════ */
+function TavoGenerator() {
+  const [theme, setTheme] = useState("dark");
+  const [step, setStep] = useState(0);
+  const [lang, setLang] = useState("zh-TW");
+  const t = T[lang];
+  const isDark = theme === "dark";
+
+  const [apiProvider, setApiProvider] = useState("anthropic");
+  const [apiKey, setApiKey] = useState("");
+  const [model, setModel] = useState("");
+  const [customEndpoint, setCustomEndpoint] = useState("");
+  const [corsMode, setCorsMode] = useState("direct");
+  const [corsProxy, setCorsProxy] = useState("");
+
+  const [charName, setCharName] = useState("");
+  const [charGender, setCharGender] = useState("male");
+  const [customGenderText, setCustomGenderText] = useState("");
+  const [charAge, setCharAge] = useState("");
+  const [charRace, setCharRace] = useState("human");
+  const [customRaceText, setCustomRaceText] = useState("");
+  const [personalityTags, setPersonalityTags] = useState([]);
+  const [customPersonalityTags, setCustomPersonalityTags] = useState([]);
+
+  const [backgroundMode, setBackgroundMode] = useState("auto");
+  const [backgroundText, setBackgroundText] = useState("");
+  const [hasRomance, setHasRomance] = useState(false);
+  const [romanceDetails, setRomanceDetails] = useState("");
+  const [specialMechanisms, setSpecialMechanisms] = useState("");
+  const [charExtra, setCharExtra] = useState("");
+  const [userRelationship, setUserRelationship] = useState("stranger");
+  const [customRelationship, setCustomRelationship] = useState("");
+
+  const [worldStyleTags, setWorldStyleTags] = useState([]);
+  const [customWorldTags, setCustomWorldTags] = useState([]);
+  const [namingStyle, setNamingStyle] = useState("mixed");
+  const [customNamingText, setCustomNamingText] = useState("");
+  const [countryCount, setCountryCount] = useState(3);
+  const [cityCount, setCityCount] = useState(2);
+  const [includeRaces, setIncludeRaces] = useState(false);
+  const [selectedRaces, setSelectedRaces] = useState([]);
+
+  const [enemyMale, setEnemyMale] = useState(0);
+  const [enemyFemale, setEnemyFemale] = useState(0);
+  const [friendMale, setFriendMale] = useState(0);
+  const [friendFemale, setFriendFemale] = useState(0);
+  const [hasFather, setHasFather] = useState(false);
+  const [hasMother, setHasMother] = useState(false);
+  const [brotherCount, setBrotherCount] = useState(0);
+  const [sisterCount, setSisterCount] = useState(0);
+  const [coreNpcIds, setCoreNpcIds] = useState(new Set());
+
+  const [toneTags, setToneTags] = useState([]);
+  const [customToneTags, setCustomToneTags] = useState([]);
+  const [firstMesMode, setFirstMesMode] = useState("auto");
+  const [firstMesText, setFirstMesText] = useState("");
+  const [entryMode, setEntryMode] = useState("auto");
+
+  const [generating, setGenerating] = useState(false);
+  const [progress, setProgress] = useState("");
+  const [progressPct, setProgressPct] = useState(0);
+  const [error, setError] = useState("");
+  const [result, setResult] = useState(null);
+  const [previewTab, setPreviewTab] = useState("desc");
+
+  const npcSlots = useMemo(() => {
+    const s = [];
+    for (let i = 0; i < enemyMale; i++) s.push({ id: `em${i}`, type: "enemy", gender: "M", label: t.enemyM + ` ${i + 1}` });
+    for (let i = 0; i < enemyFemale; i++) s.push({ id: `ef${i}`, type: "enemy", gender: "F", label: t.enemyF + ` ${i + 1}` });
+    for (let i = 0; i < friendMale; i++) s.push({ id: `fm${i}`, type: "friend", gender: "M", label: t.friendM + ` ${i + 1}` });
+    for (let i = 0; i < friendFemale; i++) s.push({ id: `ff${i}`, type: "friend", gender: "F", label: t.friendF + ` ${i + 1}` });
+    if (hasFather) s.push({ id: "father", type: "family", gender: "M", label: t.father });
+    if (hasMother) s.push({ id: "mother", type: "family", gender: "F", label: t.mother });
+    for (let i = 0; i < brotherCount; i++) s.push({ id: `bro${i}`, type: "family", gender: "M", label: t.brother + ` ${i + 1}` });
+    for (let i = 0; i < sisterCount; i++) s.push({ id: `sis${i}`, type: "family", gender: "F", label: t.sister + ` ${i + 1}` });
+    return s;
+  }, [enemyMale, enemyFemale, friendMale, friendFemale, hasFather, hasMother, brotherCount, sisterCount, t]);
+
+  const togglePersonality = useCallback(tag => setPersonalityTags(p => p.includes(tag)?p.filter(x=>x!==tag):[...p,tag]), []);
+  const addCustomP = useCallback(tag => setCustomPersonalityTags(p=>[...p,tag]), []);
+  const removeCustomP = useCallback(tag => setCustomPersonalityTags(p=>p.filter(x=>x!==tag)), []);
+  const toggleWorldStyle = useCallback(tag => setWorldStyleTags(p => p.includes(tag)?p.filter(x=>x!==tag):[...p,tag]), []);
+  const addCustomW = useCallback(tag => setCustomWorldTags(p=>[...p,tag]), []);
+  const removeCustomW = useCallback(tag => setCustomWorldTags(p=>p.filter(x=>x!==tag)), []);
+  const toggleRace = useCallback(tag => setSelectedRaces(p => p.includes(tag)?p.filter(x=>x!==tag):[...p,tag]), []);
+  const toggleTone = useCallback(tag => setToneTags(p => p.includes(tag)?p.filter(x=>x!==tag):[...p,tag]), []);
+  const addCustomT = useCallback(tag => setCustomToneTags(p=>[...p,tag]), []);
+  const removeCustomT = useCallback(tag => setCustomToneTags(p=>p.filter(x=>x!==tag)), []);
+  const toggleCore = useCallback(id => setCoreNpcIds(prev => { const n = new Set(prev); n.has(id)?n.delete(id):n.add(id); return n; }), []);
+
+  const handleGenerate = useCallback(async () => {
+    setGenerating(true); setError(""); setResult(null); setProgressPct(0);
+    const s = { language: lang, charName, charGender, customGenderText, charAge, charRace, customRaceText, personalityTags, customPersonalityTags, backgroundMode, backgroundText, hasRomance, romanceDetails, specialMechanisms, charExtra, userRelationship, customRelationship, worldStyleTags, customWorldTags, namingStyle, customNamingText, countryCount, cityCount, includeRaces, selectedRaces, toneTags, customToneTags, firstMesMode, firstMesText, entryMode };
+    const cfg = { provider:apiProvider, apiKey, model, customEndpoint, corsMode, corsProxy };
+    const total = 3 + s.countryCount + (s.includeRaces && s.selectedRaces.length > 0 ? 1 : 0) + npcSlots.length + 1;
+    let done = 0;
+    const tick = (msg) => { done++; setProgress(msg); setProgressPct(Math.round((done / total) * 100)); };
+    try {
+      tick(t.progressChar);
+      const charRaw = await callAI(cfg, buildCharPrompt(s));
+      const cm = charRaw.match(/<character_info[^>]*>([\s\S]*?)<\/character_info[^>]*>/);
+      const charContent = cm
+        ? `<character_info:{{char}}>${cm[1]}</character_info:{{char}}>`
+        : `<character_info:{{char}}>\n${charRaw}\n</character_info:{{char}}>`;
+      const eName = s.charName || (charRaw.match(/全名:\s*"?([^"(\n]+)/)?.[1]?.trim() || "角色");
+
+      tick(t.progressWorld);
+      const wRaw = await callAI(cfg, buildWorldPrompt(s, charContent));
+      const wm = wRaw.match(/<世界觀>([\s\S]*?)<\/世界觀>/);
+      const worldYaml = wm ? wm[0] : `<世界觀>\n${wRaw}\n</世界觀>`;
+      const we = [{ name: "——🌍世界觀🌍——", content: worldYaml, keys: [], selective: false }];
+
+      for (let i = 0; i < s.countryCount; i++) {
+        tick(`${t.progressCountry} (${i + 1}/${s.countryCount})`);
+        const cr = await callAI(cfg, buildCountryPrompt(s, worldYaml, i, charContent));
+        const crClean = cr.replace(/^```(?:yaml)?\n?/m, "").replace(/\n?```\s*$/m, "").trim();
+        const cm2 = crClean.match(/<([^/>\s]+)>([\s\S]*?)<\/\1>/);
+        let countryName = cm2 ? cm2[1] : (crClean.match(/^([^\s:：\n]+)\s*[:：]/m)?.[1] || `國家${i + 1}`);
+        const countryContent = cm2 ? cm2[0] : `<${countryName}>\n${crClean}\n</${countryName}>`;
+        we.push({ name: `🗺️${countryName}`, content: countryContent, keys: [], selective: false });
+      }
+
+      if (s.includeRaces && s.selectedRaces.length > 0) {
+        tick(t.progressRace);
+        const rr = await callAI(cfg, buildRacePrompt(s, worldYaml, s.selectedRaces), 12000);
+        const rm = [...rr.matchAll(/<([^/>\s]+)>([\s\S]*?)<\/\1>/g)];
+        const ov = rm.find(m => ["特殊種族", "特殊种族"].includes(m[1]));
+        if (ov) we.push({ name: "——💠特殊種族💠——", content: ov[0], keys: [], selective: false });
+        for (const r of rm) { if (["特殊種族", "特殊种族", "跨種族軼事", "跨种族轶事"].includes(r[1])) continue; const kw = s.entryMode === "auto"; we.push({ name: `📌${r[1]}`, content: r[0], keys: kw ? [r[1]] : [], selective: kw }); }
+        const cr = rm.find(m => ["跨種族軼事", "跨种族轶事"].includes(m[1]));
+        if (cr) we.push({ name: "📝跨種族軼事", content: cr[0], keys: [], selective: false });
+      }
+
+      const typeMap = { enemy: "仇人", friend: "朋友", family: "家人" };
+      for (let i = 0; i < npcSlots.length; i++) {
+        const slot = npcSlots[i]; const isCore = coreNpcIds.has(slot.id);
+        tick(`${t.progressNpc} — ${slot.label}`);
+        const spec = slot.type === "family" ? slot.label : `${typeMap[slot.type]}，${slot.gender === "M" ? "男性" : "女性"}`;
+        const nr = await callAI(cfg, buildNpcPrompt(s, worldYaml, charContent, typeMap[slot.type], spec, isCore));
+        const nrClean = nr.replace(/^```(?:yaml)?\n?/m, "").replace(/\n?```\s*$/m, "").trim();
+        const nm = nrClean.match(/<character_info:([^>]+)>([\s\S]*?)<\/character_info:\1>/);
+        let nName, nContent;
+        if (nm) {
+          nName = nm[1]; nContent = nm[0];
+        } else {
+          const openTag = nrClean.match(/<character_info:([^>]+)>/);
+          if (openTag) {
+            nName = openTag[1];
+            nContent = nrClean.includes(`</character_info:${nName}>`) ? nrClean : nrClean + `\n</character_info:${nName}>`;
+          } else {
+            const nameMatch = nrClean.match(/姓名[：:"]\s*"?([^"\n]+)/);
+            nName = nameMatch ? nameMatch[1].trim() : slot.label;
+            nContent = `<character_info:${nName}>\n${nrClean}\n</character_info:${nName}>`;
+          }
+        }
+        const kw = s.entryMode === "auto" && !isCore;
+        we.push({ name: `${isCore ? "👤" : "👥"}${nName}`, content: nContent, keys: kw ? [nName] : [], selective: kw });
+      }
+
+      tick(t.progressFirst);
+      const firstMes = await callAI(cfg, buildFirstMesPrompt(s, charContent, worldYaml));
+
+      tick(t.progressAssemble);
+      const tone = [...s.toneTags, ...s.customToneTags].join("、") || "自由發揮";
+      setResult(assemble(eName, charContent, firstMes, we, tone));
+      setProgress(t.progressDone); setProgressPct(100);
+    } catch (e) { setError(e.message || t.errorApi); }
+    finally { setGenerating(false); }
+  }, [lang, charName, charGender, customGenderText, charAge, charRace, customRaceText, personalityTags, customPersonalityTags, backgroundMode, backgroundText, hasRomance, romanceDetails, specialMechanisms, charExtra, userRelationship, customRelationship, worldStyleTags, customWorldTags, namingStyle, customNamingText, countryCount, cityCount, includeRaces, selectedRaces, toneTags, customToneTags, firstMesMode, firstMesText, entryMode, apiProvider, apiKey, model, customEndpoint, corsMode, corsProxy, npcSlots, coreNpcIds, t]);
+
+  const [copied, setCopied] = useState(false);
+
+  const copyJSON = () => {
+    if (!result) return;
+    const text = JSON.stringify(result, null, 2);
+    try {
+      navigator.clipboard.writeText(text).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); });
+    } catch {
+      // Fallback: select textarea content
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.style.cssText = "position:fixed;left:-9999px";
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch (_) {}
+      document.body.removeChild(ta);
+    }
+  };
+
+  const downloadJSON = () => {
+    if (!result) return;
+    const text = JSON.stringify(result, null, 2);
+    try {
+      // Method 1: data URI
+      const dataUri = "data:application/json;charset=utf-8," + encodeURIComponent(text);
+      const a = document.createElement("a");
+      a.href = dataUri;
+      a.download = `Tavo_${result.data.name || "char"}.json`;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    } catch {
+      // If blocked, fall back to copy
+      copyJSON();
+    }
+  };
+
+  /* ══════ CSS ══════ */
+  const css = `
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400&display=swap');
+:root{--bg:${isDark?"#0a0a0b":"#f5f3f0"};--bg2:${isDark?"rgba(20,20,22,.7)":"rgba(255,255,255,.85)"};--bg3:${isDark?"rgba(30,30,34,.5)":"rgba(240,238,235,.7)"};--bd:${isDark?"rgba(60,60,68,.5)":"rgba(200,195,185,.6)"};--t:${isDark?"#e0ddd8":"#2a2825"};--t2:${isDark?"#9a9590":"#6a665f"};--t3:${isDark?"#5a5550":"#aaa59e"};--ac:${isDark?"#c8956a":"#a06830"};--ac-bg:${isDark?"rgba(200,149,106,.15)":"rgba(160,104,48,.12)"};--ac-bd:${isDark?"rgba(200,149,106,.35)":"rgba(160,104,48,.3)"};--chip:${isDark?"#1e1e22":"#e8e5e0"};--chip-h:${isDark?"#2a2a2e":"#ddd8d2"};--chip-on:${isDark?"#8b5e3c":"#a06830"};--inp:${isDark?"rgba(20,20,24,.6)":"rgba(255,255,255,.9)"};--code:${isDark?"#0d0d0f":"#f0ede8"};--err:#c45050;--shadow:${isDark?"0 2px 12px rgba(0,0,0,.4)":"0 2px 12px rgba(0,0,0,.08)"};}
+*{box-sizing:border-box;margin:0;padding:0}
+.tg-root{min-height:100vh;background:var(--bg);color:var(--t);font-family:'Noto Sans TC','Noto Sans SC',system-ui,sans-serif;font-size:14px;line-height:1.6;transition:background .3s,color .3s}
+.tg-hdr{border-bottom:1px solid var(--bd);background:var(--bg2);backdrop-filter:blur(12px);position:sticky;top:0;z-index:10}
+.tg-hdr-in{max-width:720px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.tg-title{font-size:16px;font-weight:700;letter-spacing:-.3px}.tg-dot{color:var(--ac);margin-right:4px}
+.tg-ctrls{display:flex;gap:4px;align-items:center}
+.tg-cb{height:28px;border-radius:6px;border:1px solid var(--bd);background:var(--bg3);color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:inherit;padding:0 8px}
+.tg-cb:hover{border-color:var(--ac-bd);color:var(--ac)}.tg-cb.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.tg-main{max-width:720px;margin:0 auto;padding:20px 16px}
+.tg-steps{display:flex;gap:3px;margin-bottom:24px;overflow-x:auto;padding-bottom:4px}
+.tg-st{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;font-size:12px;font-weight:500;white-space:nowrap;cursor:pointer;transition:all .15s;color:var(--t3);border:1px solid transparent}
+.tg-st:hover{color:var(--t2)}.tg-st.on{background:var(--ac-bg);color:var(--ac);border-color:var(--ac-bd)}.tg-st.done{color:var(--ac);opacity:.7}
+.tg-sn{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.tg-st.on .tg-sn{background:var(--ac);color:#fff}.tg-st.done .tg-sn{background:var(--ac-bg);color:var(--ac)}.tg-st:not(.on):not(.done) .tg-sn{background:var(--chip);color:var(--t3)}
+.tg-sl{display:none}@media(min-width:640px){.tg-sl{display:inline}}
+.tg-card{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:var(--shadow)}
+.tg-sec{margin-bottom:20px}.tg-sec:last-child{margin-bottom:0}
+.tg-sec-t{font-size:11px;font-weight:600;color:var(--ac);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.tg-sec-l{flex:1;height:1px;background:var(--ac-bg)}
+.tg-label{display:block;font-size:13px;font-weight:500;color:var(--t2);margin-bottom:4px}.tg-label-sm{font-size:12px;color:var(--t2);white-space:nowrap}
+.tg-req{color:var(--ac);margin-left:3px}
+.tg-input{width:100%;background:var(--inp);border:1px solid var(--bd);border-radius:8px;padding:7px 10px;font-size:13px;color:var(--t);font-family:inherit;transition:border-color .15s;outline:none}
+.tg-input:focus{border-color:var(--ac-bd)}.tg-input::placeholder{color:var(--t3)}
+textarea.tg-input{resize:vertical;min-height:70px}
+select.tg-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239a9590'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;cursor:pointer}
+.tg-btn{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--bd);background:var(--bg3);color:var(--t2);transition:all .15s;font-family:inherit}
+.tg-btn:hover{border-color:var(--ac-bd);color:var(--t)}.tg-btn.on{background:var(--chip-on);color:#fff;border-color:var(--chip-on)}
+.tg-btn-p{background:var(--ac);color:#fff;border-color:var(--ac)}.tg-btn-p:hover{opacity:.9}.tg-btn-p:disabled{opacity:.3;cursor:not-allowed}
+.tg-chip{padding:4px 10px;border-radius:6px;font-size:12px;font-weight:500;border:none;cursor:pointer;transition:all .15s;background:var(--chip);color:var(--t2);font-family:inherit}
+.tg-chip:hover{background:var(--chip-h);color:var(--t)}.tg-chip-on{background:var(--chip-on)!important;color:#fff!important}
+.tg-chip-custom{background:var(--ac-bg);color:var(--ac)}.tg-chip-custom:hover{background:rgba(200,80,80,.15);color:var(--err)}
+.tg-num{display:inline-flex;align-items:center;background:var(--chip);border-radius:6px;border:1px solid var(--bd);overflow:hidden}
+.tg-num button{width:28px;height:28px;border:none;background:transparent;color:var(--t2);cursor:pointer;font-size:14px;font-family:inherit}.tg-num button:hover{color:var(--ac);background:var(--ac-bg)}
+.tg-num span{min-width:24px;text-align:center;font-size:13px;color:var(--t);font-weight:500}
+.tg-tog{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.tg-tog-tr{width:34px;height:18px;border-radius:9px;position:relative;transition:background .2s}
+.tg-tog-tr.off{background:var(--bd)}.tg-tog-tr.on{background:var(--ac)}
+.tg-tog-th{width:14px;height:14px;border-radius:50%;background:#fff;position:absolute;top:2px;transition:left .2s}
+.tg-npc-list{display:flex;flex-direction:column;gap:4px}
+.tg-npc{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;border:1px solid var(--bd);background:var(--bg3);transition:all .15s;cursor:pointer}
+.tg-npc:hover{border-color:var(--ac-bd)}.tg-npc.core{border-color:var(--ac);background:var(--ac-bg)}
+.tg-npc-ck{width:16px;height:16px;border-radius:4px;border:2px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;transition:all .15s}
+.tg-npc.core .tg-npc-ck{background:var(--ac);border-color:var(--ac);color:#fff}
+.tg-npc-nm{flex:1;font-size:13px;color:var(--t)}
+.tg-badge{font-size:10px;padding:1px 6px;border-radius:4px;font-weight:600}
+.tg-badge-c{background:var(--ac-bg);color:var(--ac)}.tg-badge-s{background:var(--chip);color:var(--t3)}
+.tg-prog{text-align:center;padding:40px 0}
+.tg-spin{width:48px;height:48px;border:3px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:sp .8s linear infinite;margin:0 auto 16px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.tg-pbar{width:200px;height:6px;background:var(--chip);border-radius:3px;overflow:hidden;margin:8px auto}
+.tg-pfill{height:100%;background:var(--ac);border-radius:3px;transition:width .5s}
+.tg-prev{background:var(--code);border:1px solid var(--bd);border-radius:8px;padding:12px;max-height:360px;overflow:auto}
+.tg-prev pre{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t2);white-space:pre-wrap;word-break:break-all;line-height:1.5}
+.tg-mh{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.tg-mhb{font-size:11px;padding:2px 8px;border-radius:4px;background:var(--chip);color:var(--t3);cursor:pointer;border:none;font-family:'JetBrains Mono',monospace;transition:all .15s}
+.tg-mhb:hover{color:var(--ac);background:var(--ac-bg)}
+.tg-nav{display:flex;justify-content:space-between}.tg-err{background:rgba(196,80,80,.1);border:1px solid rgba(196,80,80,.3);border-radius:8px;padding:10px 14px;color:var(--err);font-size:13px;margin-top:12px}
+.tg-g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.tg-mb{margin-bottom:10px}
+.tg-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tg-note{font-size:11px;margin-top:6px;padding:4px 8px;border-radius:4px}
+.tg-note-warn{color:var(--ac);background:var(--ac-bg)}`;
+
+  const pModels = PROVIDERS[apiProvider]?.models || [];
+
+  const stepContent = (idx, children) => (
+    <div style={{ display: step === idx ? "block" : "none" }}>{children}</div>
+  );
+
+  return (<div className="tg-root"><style>{css}</style>
+    <div className="tg-hdr"><div className="tg-hdr-in">
+      <div className="tg-title"><span className="tg-dot">◆</span>{t.title}</div>
+      <div className="tg-ctrls">
+        {[["zh-TW", "繁"], ["zh-CN", "简"], ["en", "EN"]].map(([k, v]) => <button key={k} onClick={() => setLang(k)} className={`tg-cb ${lang === k ? "on" : ""}`}>{v}</button>)}
+        <div style={{ width: 1, height: 16, background: "var(--bd)", margin: "0 2px" }} />
+        <button onClick={() => setTheme(isDark ? "light" : "dark")} className="tg-cb">{isDark ? "☀ " + t.themeLight : "🌙 " + t.themeDark}</button>
+      </div>
+    </div></div>
+    <div className="tg-main">
+      <div className="tg-steps">{t.steps.map((s, i) => <div key={i} onClick={() => !generating && setStep(i)} className={`tg-st ${i === step ? "on" : i < step ? "done" : ""}`}><div className="tg-sn">{i < step ? "✓" : i + 1}</div><span className="tg-sl">{s}</span></div>)}</div>
+      <div className="tg-card">
+        {stepContent(0, <div>
+          <Section title={t.apiProvider}>
+            <div className="tg-row tg-mb">{Object.entries(PROVIDERS).map(([k, v]) => <button key={k} onClick={() => { setApiProvider(k); setModel(""); }} className={`tg-btn ${apiProvider === k ? "on" : ""}`}>{v.label}</button>)}</div>
+            {apiProvider === "custom" && <div className="tg-mb"><label className="tg-label">{t.customEndpoint}</label><input value={customEndpoint} onChange={e => setCustomEndpoint(e.target.value)} placeholder="https://api.example.com/v1/chat/completions" className="tg-input" /></div>}
+            <div className="tg-mb"><label className="tg-label">{t.apiKey}<span className="tg-req">*</span></label><input value={apiKey} onChange={e => setApiKey(e.target.value)} placeholder={t.apiKeyPh} type="password" className="tg-input" /></div>
+            <div><label className="tg-label">{t.model}<span className="tg-req">*</span></label><input value={model} onChange={e => setModel(e.target.value)} placeholder={t.modelPh} className="tg-input" />
+              {pModels.length > 0 && <div className="tg-mh"><span className="tg-label-sm" style={{ marginRight: 2 }}>{t.modelHint}:</span>{pModels.map(m => <button key={m} onClick={() => setModel(m)} className="tg-mhb">{m}</button>)}</div>}
+            </div>
+            <div className="tg-mb" style={{marginTop:12}}>
+              <label className="tg-label">{t.corsMode}</label>
+              <div className="tg-row">
+                <button onClick={() => setCorsMode("direct")} className={`tg-btn ${corsMode === "direct" ? "on" : ""}`}>{t.corsDirect}</button>
+                <button onClick={() => setCorsMode("builtin")} className={`tg-btn ${corsMode === "builtin" ? "on" : ""}`}>{t.corsBuiltin}</button>
+                <button onClick={() => setCorsMode("custom")} className={`tg-btn ${corsMode === "custom" ? "on" : ""}`}>{t.corsCustom}</button>
+              </div>
+              {!PROVIDERS[apiProvider]?.corsOk && corsMode === "direct" && <p className="tg-note tg-note-warn">{t.corsNote}</p>}
+              {corsMode === "builtin" && <p className="tg-note tg-note-warn">{t.corsBuiltinNote}</p>}
+              {corsMode === "custom" && <input value={corsProxy} onChange={e => setCorsProxy(e.target.value)} placeholder={t.corsProxyPh} className="tg-input" style={{ marginTop: 6 }} />}
+            </div>
+          </Section>
+          <Section title={t.language}><div className="tg-row">{[["zh-TW", "繁體中文"], ["zh-CN", "简体中文"], ["en", "English"]].map(([k, v]) => <button key={k} onClick={() => setLang(k)} className={`tg-btn ${lang === k ? "on" : ""}`}>{v}</button>)}</div></Section>
+        </div>)}
+        {stepContent(1, <div>
+          <Section title={t.charName}><input value={charName} onChange={e => setCharName(e.target.value)} placeholder={t.charNamePh} className="tg-input" /></Section>
+          <Section title={t.charGender}><div className="tg-row tg-mb">{["male", "female", "nonbinary", "custom"].map((g, i) => <button key={g} onClick={() => setCharGender(g)} className={`tg-btn ${charGender === g ? "on" : ""}`}>{t.genderOpts[i]}</button>)}</div>{charGender === "custom" && <input value={customGenderText} onChange={e => setCustomGenderText(e.target.value)} placeholder={t.customGender} className="tg-input" />}</Section>
+          <Section title={t.charAge}><input value={charAge} onChange={e => setCharAge(e.target.value)} placeholder={t.charAgePh} className="tg-input" /></Section>
+          <Section title={t.charRace}><select value={charRace} onChange={e => setCharRace(e.target.value)} className="tg-input">{Object.entries(t.raceOpts).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>{charRace === "custom" && <input value={customRaceText} onChange={e => setCustomRaceText(e.target.value)} placeholder={t.customRace} className="tg-input" style={{ marginTop: 6 }} />}</Section>
+          <Section title={t.personality}><TagSelector tags={t.personalityTags} selected={personalityTags} onToggle={togglePersonality} customTags={customPersonalityTags} onAddCustom={addCustomP} onRemoveCustom={removeCustomP} placeholder={t.customTagPh} /></Section>
+        </div>)}
+        {stepContent(2, <div>
+          <Section title={t.background}><div className="tg-row tg-mb"><button onClick={() => setBackgroundMode("auto")} className={`tg-btn ${backgroundMode === "auto" ? "on" : ""}`}>{t.bgAuto}</button><button onClick={() => setBackgroundMode("custom")} className={`tg-btn ${backgroundMode === "custom" ? "on" : ""}`}>{t.bgCustom}</button></div>{backgroundMode === "custom" && <><textarea value={backgroundText} onChange={e => setBackgroundText(e.target.value)} placeholder={t.bgPh} className="tg-input" rows={4} /><VarBtn onInsert={v => setBackgroundText(p => p + v)} /></>}</Section>
+          <Section title={t.romance}><div className="tg-row tg-mb"><button onClick={() => setHasRomance(false)} className={`tg-btn ${!hasRomance ? "on" : ""}`}>{t.romanceNo}</button><button onClick={() => setHasRomance(true)} className={`tg-btn ${hasRomance ? "on" : ""}`}>{t.romanceYes}</button></div>{hasRomance && <><textarea value={romanceDetails} onChange={e => setRomanceDetails(e.target.value)} placeholder={t.romanceDetailPh} className="tg-input" rows={3} /><VarBtn onInsert={v => setRomanceDetails(p => p + v)} /></>}</Section>
+          <Section title={t.specialMech}><textarea value={specialMechanisms} onChange={e => setSpecialMechanisms(e.target.value)} placeholder={t.specialMechPh} className="tg-input" rows={3} /><VarBtn onInsert={v => setSpecialMechanisms(p => p + v)} /></Section>
+          <Section title={t.charExtra}><textarea value={charExtra} onChange={e => setCharExtra(e.target.value)} placeholder={t.charExtraPh} className="tg-input" rows={3} /><VarBtn onInsert={v => setCharExtra(p => p + v)} /></Section>
+          <Section title={t.userRelation}><select value={userRelationship} onChange={e => setUserRelationship(e.target.value)} className="tg-input">{Object.entries(t.relationOpts).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>{userRelationship === "custom" && <input value={customRelationship} onChange={e => setCustomRelationship(e.target.value)} placeholder={t.customRelation} className="tg-input" style={{ marginTop: 6 }} />}</Section>
+        </div>)}
+        {stepContent(3, <div>
+          <Section title={t.worldStyle}><TagSelector tags={t.worldTags} selected={worldStyleTags} onToggle={toggleWorldStyle} customTags={customWorldTags} onAddCustom={addCustomW} onRemoveCustom={removeCustomW} placeholder={t.customWorldPh} /></Section>
+          <Section title={t.namingStyle}><select value={namingStyle} onChange={e => setNamingStyle(e.target.value)} className="tg-input">{Object.entries(t.namingOpts).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>{namingStyle === "custom" && <input value={customNamingText} onChange={e => setCustomNamingText(e.target.value)} placeholder={t.customNaming} className="tg-input" style={{ marginTop: 6 }} />}</Section>
+          <div className="tg-g2"><Section title={t.countryCount}><NumInput value={countryCount} onChange={setCountryCount} min={1} max={10} /></Section><Section title={t.cityCount}><NumInput value={cityCount} onChange={setCityCount} min={1} max={10} /></Section></div>
+          <Section title={t.includeRaces}><Toggle checked={includeRaces} onChange={setIncludeRaces} label={t.includeRaces} />{includeRaces && <div style={{ marginTop: 10 }}><TagSelector tags={t.worldRaceTags} selected={selectedRaces} onToggle={toggleRace} customTags={[]} onAddCustom={() => { }} onRemoveCustom={() => { }} placeholder="" /></div>}</Section>
+        </div>)}
+        {stepContent(4, <div>
+          <Section title={t.enemies}><div className="tg-row"><NumInput value={enemyMale} onChange={setEnemyMale} label={t.maleCount} /><NumInput value={enemyFemale} onChange={setEnemyFemale} label={t.femaleCount} /></div></Section>
+          <Section title={t.friends}><div className="tg-row"><NumInput value={friendMale} onChange={setFriendMale} label={t.maleCount} /><NumInput value={friendFemale} onChange={setFriendFemale} label={t.femaleCount} /></div></Section>
+          <Section title={t.family}><div className="tg-row tg-mb"><Toggle checked={hasFather} onChange={setHasFather} label={t.father} /><Toggle checked={hasMother} onChange={setHasMother} label={t.mother} /></div><div className="tg-row"><NumInput value={brotherCount} onChange={setBrotherCount} label={t.brother} max={5} /><NumInput value={sisterCount} onChange={setSisterCount} label={t.sister} max={5} /></div></Section>
+          <Section title={t.npcPreview}>{npcSlots.length === 0 ? <p style={{ color: "var(--t3)", fontSize: 13 }}>{t.noNpc}</p> : <div className="tg-npc-list">{npcSlots.map(slot => { const c = coreNpcIds.has(slot.id); return (<div key={slot.id} className={`tg-npc ${c ? "core" : ""}`} onClick={() => toggleCore(slot.id)}><div className="tg-npc-ck">{c ? "✓" : ""}</div><span className="tg-npc-nm">{slot.label}</span><span className={`tg-badge ${c ? "tg-badge-c" : "tg-badge-s"}`}>{c ? t.coreLabel : t.simpleLabel}</span></div>); })}</div>}</Section>
+        </div>)}
+        {stepContent(5, <div>
+          <Section title={t.toneTitle}><TagSelector tags={t.toneTags} selected={toneTags} onToggle={toggleTone} customTags={customToneTags} onAddCustom={addCustomT} onRemoveCustom={removeCustomT} placeholder={t.customTonePh} /></Section>
+          <Section title={t.firstMes}><div className="tg-row tg-mb"><button onClick={() => setFirstMesMode("auto")} className={`tg-btn ${firstMesMode === "auto" ? "on" : ""}`}>{t.fmAuto}</button><button onClick={() => setFirstMesMode("custom")} className={`tg-btn ${firstMesMode === "custom" ? "on" : ""}`}>{t.fmCustom}</button></div>{firstMesMode === "custom" && <><textarea value={firstMesText} onChange={e => setFirstMesText(e.target.value)} placeholder={t.fmPh} className="tg-input" rows={4} /><VarBtn onInsert={v => setFirstMesText(p => p + v)} /></>}</Section>
+          <Section title={t.entryMode}><div className="tg-row"><button onClick={() => setEntryMode("all_constant")} className={`tg-btn ${entryMode === "all_constant" ? "on" : ""}`}>{t.entryAllConst}</button><button onClick={() => setEntryMode("auto")} className={`tg-btn ${entryMode === "auto" ? "on" : ""}`}>{t.entryAuto}</button></div></Section>
+        </div>)}
+        {stepContent(6, <div>
+          {!result ? (<>
+            {generating ? (<div className="tg-prog"><div className="tg-spin" /><p style={{ color: "var(--ac)", fontSize: 13 }}>{progress}</p><div className="tg-pbar"><div className="tg-pfill" style={{ width: `${progressPct}%` }} /></div><p style={{ color: "var(--t3)", fontSize: 12 }}>{progressPct}%</p></div>)
+              : (<div style={{ textAlign: "center", padding: "40px 0" }}><div style={{ fontSize: 40, marginBottom: 12 }}>📜</div><p style={{ color: "var(--t2)", marginBottom: 20, fontSize: 13 }}>{t.readyMsg}</p><button onClick={handleGenerate} disabled={!apiKey || !model} className="tg-btn tg-btn-p" style={{ padding: "10px 32px", fontSize: 15 }}>{t.generate}</button>{(!apiKey || !model) && <p style={{ color: "var(--err)", fontSize: 12, marginTop: 10 }}>{t.apiNeedKey}</p>}</div>)}
+            {error && <div className="tg-err">{error}</div>}
+          </>) : (<>
+            <div className="tg-row tg-mb" style={{ justifyContent: "space-between", flexWrap: "wrap" }}>
+              <div className="tg-row">{["desc", "first", "book", "json"].map(tab => <button key={tab} onClick={() => setPreviewTab(tab)} className={`tg-btn ${previewTab === tab ? "on" : ""}`}>{{ desc: "Description", first: "First Msg", book: "World Book", json: "JSON" }[tab]}</button>)}</div>
+              <div className="tg-row"><button onClick={downloadJSON} className="tg-btn tg-btn-p">{t.download}</button><button onClick={copyJSON} className="tg-btn" style={copied?{borderColor:"var(--ac)",color:"var(--ac)"}:{}}>{copied ? "✓ Copied!" : "📋 Copy JSON"}</button><button onClick={() => { setResult(null); setStep(0); }} className="tg-btn">{t.restart}</button></div>
+            </div>
+            <div className="tg-prev"><pre>{previewTab === "json" && JSON.stringify(result, null, 2)}{previewTab === "desc" && result.data.description}{previewTab === "first" && result.data.first_mes}{previewTab === "book" && result.data.character_book.entries.map(e => `--- ${e.name} ---\nconst: ${e.constant} | keys: ${(e.keys || []).join(",") || "(none)"}\n${e.content}\n\n`).join("")}</pre></div>
+          </>)}
+        </div>)}
+      </div>
+      {step < 6 && <div className="tg-nav"><button onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0} className="tg-btn" style={{ padding: "8px 20px", opacity: step === 0 ? .3 : 1 }}>{t.back}</button><button onClick={() => setStep(Math.min(6, step + 1))} className="tg-btn tg-btn-p" style={{ padding: "8px 20px" }}>{t.next}</button></div>}
+    </div>
+  </div>);
+}
+
+
+const container = document.getElementById('root');
+const root = ReactDOM.createRoot(container);
+root.render(React.createElement(TavoGenerator));
+  </script>
 </body>
 </html>
