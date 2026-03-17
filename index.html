@@ -238,6 +238,8 @@ function buildCharPrompt(s) {
   const relMap = { stranger: "陌生人", acquaintance: "點頭之交", colleague: "同事", friend: "朋友", rival: "對手", employer: "雇主" };
   const rel = s.userRelationship === "custom" ? s.customRelationship : (relMap[s.userRelationship] || s.userRelationship);
   const mod = isModern([...s.worldStyleTags, ...s.customWorldTags]);
+  const worldTags = [...s.worldStyleTags, ...s.customWorldTags];
+  const hasWorld = worldTags.length > 0;
   return `You are a master character writer for roleplay cards (Tavo/SillyTavern). Write in ${L(s.language)}.
 
 Generate a complete character profile in YAML. Parameters:
@@ -248,6 +250,7 @@ Generate a complete character profile in YAML. Parameters:
 - Romance: ${rm} | Special: ${s.specialMechanisms || "無"}
 - Relationship with {{user}}: ${rel}
 ${s.charExtra ? `- Additional notes: ${s.charExtra}` : ""}
+${hasWorld ? `- World style: ${worldTags.join("、")} — CRITICAL: ALL details (clothing, technology, lifestyle, speech, occupation) MUST match this world style. No anachronistic elements.` : ""}
 
 Wrap in <character_info:{{char}}>. YAML sections: 基本資料, 外貌與體態, 性格 (LIVING PROSE with anecdotes), 語癖與說話習慣 (with dialogue examples), 興趣愛好, 童年與過往.
 Use > for prose, quotes for short values. THREE-DIMENSIONAL with flaws and charm.
@@ -301,9 +304,12 @@ function buildNpcPrompt(s, world, charY, type, spec, isCore) {
     ? "FULL: 基本資料, 外貌與體態, 性格 (anecdotes), 語癖 (dialogue), 與{{char}}的關係 (memories). Rich prose."
     : "BRIEF: 基本資料, 外貌 (2-3 sentences), 性格 (1 paragraph), 與{{char}}的關係 (2-3 sentences).";
   return `Character writer. Write in ${L(s.language)}. Generate NPC.
+  const npcWorldTags = [...s.worldStyleTags, ...s.customWorldTags];
+  const npcHasWorld = npcWorldTags.length > 0;
 WORLD: ${world.substring(0, 1500)}\nMAIN CHAR: ${charY.substring(0, 1500)}
 NPC: ${type} (${spec}) | Detail: ${d}
 NPC must live in the SAME world. Use locations from the world setting.
+${npcHasWorld ? `CRITICAL: World style is 「${npcWorldTags.join("、")}」. ALL NPC details MUST match this world logic. No anachronistic elements.` : ""}
 Wrap in <character_info:NPC名字>. YAML. Distinct voice. Output ONLY YAML.`;
 }
 
