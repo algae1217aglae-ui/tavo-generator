@@ -57,6 +57,7 @@ const T = {
     progressChar: "正在生成角色描述…", progressWorld: "正在生成世界觀…", progressCountry: "正在生成國家設定",
     progressRace: "正在生成種族體系…", progressNpc: "正在生成 NPC", progressFirst: "正在生成開場白…",
     progressAssemble: "正在組裝角色卡…", progressDone: "生成完成！",
+    autoFillV1: "點一下自動填入 /v1/chat/completions",
     customTrouble: ["遇到錯誤？以下是常見原因：", "① 端點 URL 填錯或缺少 /v1/chat/completions", "② 模型名稱和平台後台不一致（注意大小寫）", "③ API Key 無效、已過期或餘額不足", "④ 平台不支援瀏覽器直連，請改用代理", "⑤ 請求超出模型的 token 上限", "⑥ 模型回傳為空（部分模型對某些 prompt 有內容限制）", "⑦ 供應商平台自身的問題（服務中斷、維護中等）"],
     errorApi: "API 呼叫失敗", apiNeedKey: "請先填寫 API 金鑰和模型名稱",
     readyMsg: "準備生成角色卡", themeLight: "淺色", themeDark: "深色",
@@ -103,6 +104,7 @@ const T = {
     progressChar: "正在生成角色描述…", progressWorld: "正在生成世界观…", progressCountry: "正在生成国家设定",
     progressRace: "正在生成种族体系…", progressNpc: "正在生成 NPC", progressFirst: "正在生成开场白…",
     progressAssemble: "正在组装角色卡…", progressDone: "生成完成！",
+    autoFillV1: "点一下自动填入 /v1/chat/completions",
     customTrouble: ["遇到报错？以下是常见原因：", "① 端点 URL 填错或缺少 /v1/chat/completions", "② 模型名称和平台后台不一致（注意大小写）", "③ API Key 无效、已过期或余额不足", "④ 平台不支持浏览器直连，请改用代理", "⑤ 请求超出模型的 token 上限", "⑥ 模型返回为空（部分模型对某些 prompt 有内容限制）", "⑦ 供应商平台自身的问题（服务中断、维护中等）"],
     errorApi: "API 调用失败", apiNeedKey: "请先填写 API 密钥和模型名称",
     readyMsg: "准备生成角色卡", themeLight: "浅色", themeDark: "深色",
@@ -149,6 +151,7 @@ const T = {
     progressChar: "Generating character…", progressWorld: "Generating world…", progressCountry: "Generating countries",
     progressRace: "Generating races…", progressNpc: "Generating NPC", progressFirst: "Generating opening…",
     progressAssemble: "Assembling…", progressDone: "Done!",
+    autoFillV1: "Auto-fill /v1/chat/completions",
     customTrouble: ["Getting errors? Common causes:", "① Wrong endpoint URL or missing /v1/chat/completions", "② Model name doesn't match platform channel settings (case-sensitive)", "③ API Key invalid, expired, or out of credits", "④ Platform blocks browser requests — switch to a proxy", "⑤ Request exceeds the model's token limit", "⑥ Empty response from model (some models restrict certain content)", "⑦ Provider platform issue (outage, maintenance, etc.)"],
     errorApi: "API failed", apiNeedKey: "API key and model required",
     readyMsg: "Ready to generate", themeLight: "Light", themeDark: "Dark",
@@ -680,7 +683,7 @@ select.tg-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
         {stepContent(0, <div>
           <Section title={t.apiProvider}>
             <div className="tg-row tg-mb">{Object.entries(PROVIDERS).map(([k, v]) => <button key={k} onClick={() => { setApiProvider(k); setModel(""); }} className={`tg-btn ${apiProvider === k ? "on" : ""}`}>{v.label}</button>)}</div>
-            {apiProvider === "custom" && <div className="tg-mb"><label className="tg-label">{t.customEndpoint}</label><input value={customEndpoint} onChange={e => setCustomEndpoint(e.target.value)} placeholder="https://api.example.com/v1/chat/completions" className="tg-input" /><button type="button" onClick={() => setCustomEndpoint(v => { const base = v.replace(/\/v1\/chat\/completions\s*$/, "").replace(/\/+$/, ""); return base + "/v1/chat/completions"; })} className="tg-mhb" style={{marginTop:6,display:"block",fontSize:11,padding:"4px 10px"}}>點一下自動填入 /v1/chat/completions</button></div>}
+            {apiProvider === "custom" && <div className="tg-mb"><label className="tg-label">{t.customEndpoint}</label><input value={customEndpoint} onChange={e => setCustomEndpoint(e.target.value)} placeholder="https://api.example.com/v1/chat/completions" className="tg-input" /><button type="button" onClick={() => setCustomEndpoint(v => { const base = v.replace(/\/v1\/chat\/completions\s*$/, "").replace(/\/+$/, ""); return base + "/v1/chat/completions"; })} className="tg-mhb" style={{marginTop:6,display:"block",fontSize:11,padding:"4px 10px"}}>{t.autoFillV1}</button></div>}
             <div className="tg-mb"><label className="tg-label">{t.apiKey}<span className="tg-req">*</span></label><input value={apiKey} onChange={e => setApiKey(e.target.value)} placeholder={t.apiKeyPh} type="password" className="tg-input" /></div>
             <div><label className="tg-label">{t.model}<span className="tg-req">*</span></label><input value={model} onChange={e => setModel(e.target.value)} placeholder={t.modelPh} className="tg-input" />
               {pModels.length > 0 && <div className="tg-mh"><span className="tg-label-sm" style={{ marginRight: 2 }}>{t.modelHint}:</span>{pModels.map(m => <button key={m} onClick={() => setModel(m)} className="tg-mhb">{m}</button>)}</div>}
