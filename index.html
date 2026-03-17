@@ -35,10 +35,11 @@ const T = {
     userRelation: "與 User 的初始關係",
     relationOpts: { stranger: "陌生人", acquaintance: "點頭之交", colleague: "同事", friend: "朋友", rival: "對手", employer: "雇主/委託人", custom: "自訂" },
     customRelation: "自訂關係",
+    worldNote: "世界觀、NPC、種族三項皆不設定時，將跳過世界書生成，角色卡不含世界書。", npcNote: "此頁設定的所有 NPC 均以主角（{{char}}）為中心——他們的身份、記憶、情感都圍繞著主角定義。",
     worldStyle: "世界觀風格",
     worldTags: ["現代", "克蘇魯", "科幻", "玄幻", "奇幻", "末日", "賽博龐克", "蒸汽龐克", "中世紀", "武俠", "都市異能", "校園", "維多利亞", "哥德", "軍事", "海盜", "太空歌劇"],
     customWorldPh: "自訂世界觀標籤（Enter 新增）", namingStyle: "命名風格",
-    namingOpts: { cn: "中式", jp: "日式", west: "西歐式", nordic: "北歐式", ru: "俄式", arabic: "阿拉伯式", mixed: "混合", custom: "自訂" },
+    namingOpts: { none: "不指定", cn: "中式", jp: "日式", west: "西歐式", nordic: "北歐式", ru: "俄式", arabic: "阿拉伯式", mixed: "混合", custom: "自訂" },
     customNaming: "自訂命名風格", countryCount: "國家數量", cityCount: "城市數量（每國）",
     includeRaces: "包含種族體系", raceSystem: "種族選項",
     worldRaceTags: ["吸血鬼", "狼人", "精靈", "矮人", "鬼", "狐狸精", "天狗", "雪女", "龍族", "惡魔", "天使", "獸人", "巨人", "妖精", "不死族"],
@@ -49,7 +50,7 @@ const T = {
     toneTitle: "敘事基調",
     toneTags: ["沉重", "輕鬆", "黑暗", "溫暖", "懸疑", "浪漫", "詼諧", "悲壯", "日常", "冒險", "荒誕", "治癒", "緊張", "哲學"],
     customTonePh: "自訂基調標籤（Enter 新增）",
-    firstMes: "開場白", fmAuto: "AI 自由發揮", fmCustom: "自訂劇情開場", fmPh: "描述你想要的開場情境…",
+    firstMes: "開場白", fmAuto: "AI 自由發揮", fmCustom: "自訂劇情開場", fmSkip: "不需生成", fmPh: "描述你想要的開場情境…",
     entryMode: "世界書條目模式", entryAllConst: "全部常駐", entryAuto: "工具協助（常駐 + 關鍵字觸發）",
     generate: "開始生成", download: "下載 JSON", restart: "重新開始",
     back: "上一步", next: "下一步",
@@ -79,10 +80,11 @@ const T = {
     userRelation: "与 User 的初始关系",
     relationOpts: { stranger: "陌生人", acquaintance: "点头之交", colleague: "同事", friend: "朋友", rival: "对手", employer: "雇主/委托人", custom: "自定义" },
     customRelation: "自定义关系",
+    worldNote: "世界观、NPC、种族三项均不设定时，将跳过世界书生成，角色卡不含世界书。", npcNote: "此页设定的所有 NPC 均以主角（{{char}}）为中心——他们的身份、记忆、情感都围绕着主角定义。",
     worldStyle: "世界观风格",
     worldTags: ["现代", "克苏鲁", "科幻", "玄幻", "奇幻", "末日", "赛博朋克", "蒸汽朋克", "中世纪", "武侠", "都市异能", "校园", "维多利亚", "哥特", "军事", "海盗", "太空歌剧"],
     customWorldPh: "自定义世界观标签（Enter 新增）", namingStyle: "命名风格",
-    namingOpts: { cn: "中式", jp: "日式", west: "西欧式", nordic: "北欧式", ru: "俄式", arabic: "阿拉伯式", mixed: "混合", custom: "自定义" },
+    namingOpts: { none: "不指定", cn: "中式", jp: "日式", west: "西欧式", nordic: "北欧式", ru: "俄式", arabic: "阿拉伯式", mixed: "混合", custom: "自定义" },
     customNaming: "自定义命名风格", countryCount: "国家数量", cityCount: "城市数量（每国）",
     includeRaces: "包含种族体系", raceSystem: "种族选项",
     worldRaceTags: ["吸血鬼", "狼人", "精灵", "矮人", "鬼", "狐狸精", "天狗", "雪女", "龙族", "恶魔", "天使", "兽人", "巨人", "妖精", "不死族"],
@@ -93,7 +95,7 @@ const T = {
     toneTitle: "叙事基调",
     toneTags: ["沉重", "轻松", "黑暗", "温暖", "悬疑", "浪漫", "诙谐", "悲壮", "日常", "冒险", "荒诞", "治愈", "紧张", "哲学"],
     customTonePh: "自定义基调标签（Enter 新增）",
-    firstMes: "开场白", fmAuto: "AI 自由发挥", fmCustom: "自定义剧情开场", fmPh: "描述你想要的开场情境…",
+    firstMes: "开场白", fmAuto: "AI 自由发挥", fmCustom: "自定义剧情开场", fmSkip: "不需生成", fmPh: "描述你想要的开场情境…",
     entryMode: "世界书条目模式", entryAllConst: "全部常驻", entryAuto: "工具协助（常驻 + 关键字触发）",
     generate: "开始生成", download: "下载 JSON", restart: "重新开始",
     back: "上一步", next: "下一步",
@@ -123,10 +125,11 @@ const T = {
     userRelation: "Relationship with User",
     relationOpts: { stranger: "Stranger", acquaintance: "Acquaintance", colleague: "Colleague", friend: "Friend", rival: "Rival", employer: "Employer", custom: "Custom" },
     customRelation: "Custom",
+    worldNote: "If no world style, NPC, or race settings are added, the world book will be skipped entirely.", npcNote: "All NPCs here are defined in relation to {{char}} — their identity, memories, and feelings all revolve around the main character.",
     worldStyle: "World Style",
     worldTags: ["Modern", "Cthulhu", "Sci-fi", "Xianxia", "Fantasy", "Post-apocalyptic", "Cyberpunk", "Steampunk", "Medieval", "Wuxia", "Urban Supernatural", "Campus", "Victorian", "Gothic", "Military", "Pirate", "Space Opera"],
     customWorldPh: "Custom tag (Enter)", namingStyle: "Naming Style",
-    namingOpts: { cn: "Chinese", jp: "Japanese", west: "Western", nordic: "Nordic", ru: "Russian", arabic: "Arabic", mixed: "Mixed", custom: "Custom" },
+    namingOpts: { none: "None", cn: "Chinese", jp: "Japanese", west: "Western", nordic: "Nordic", ru: "Russian", arabic: "Arabic", mixed: "Mixed", custom: "Custom" },
     customNaming: "Custom", countryCount: "Countries", cityCount: "Cities/Country",
     includeRaces: "Include Races", raceSystem: "Races",
     worldRaceTags: ["Vampire", "Werewolf", "Elf", "Dwarf", "Ghost", "Fox Spirit", "Tengu", "Yuki-onna", "Dragon", "Demon", "Angel", "Orc", "Giant", "Fairy", "Undead"],
@@ -137,7 +140,7 @@ const T = {
     toneTitle: "Tone",
     toneTags: ["Heavy", "Light", "Dark", "Warm", "Suspenseful", "Romantic", "Humorous", "Tragic", "Slice of Life", "Adventure", "Absurd", "Healing", "Tense", "Philosophical"],
     customTonePh: "Custom tone (Enter)",
-    firstMes: "Opening", fmAuto: "AI generates", fmCustom: "Custom scenario", fmPh: "Describe opening…",
+    firstMes: "Opening", fmAuto: "AI generates", fmCustom: "Custom scenario", fmSkip: "Skip", fmPh: "Describe opening…",
     entryMode: "Entry Mode", entryAllConst: "All Constant", entryAuto: "Auto (Const + Keyword)",
     generate: "Generate", download: "Download JSON", restart: "Start Over",
     back: "Back", next: "Next",
@@ -257,8 +260,8 @@ function buildWorldPrompt(s, charYaml) {
   const locMatch = charYaml?.match(/居住地[：:]\s*"?([^"\n]+)/);
   const charLoc = locMatch ? locMatch[1].trim() : null;
   return `Worldbuilder. Write in ${L(s.language)}. Generate world overview in YAML.
-Style: ${styles} | Naming: ${s.namingStyle === "custom" ? s.customNamingText : (nm[s.namingStyle] || s.namingStyle)}
-Countries: ${s.countryCount}, Cities/country: ${s.cityCount}
+Style: ${styles} | Naming: ${s.namingStyle === "none" ? "自由發揮" : s.namingStyle === "custom" ? s.customNamingText : (nm[s.namingStyle] || s.namingStyle)}
+${s.countryCount > 0 ? `Countries: ${s.countryCount}` : "No countries needed — world overview only."}${s.cityCount > 0 ? `, Cities/country: ${s.cityCount}` : ""}
 ${charLoc ? `IMPORTANT: The main character lives in「${charLoc}」. This location MUST exist in the world.` : ""}
 
 RULES:
@@ -274,7 +277,7 @@ function buildCountryPrompt(s, world, i, charYaml) {
   const locMatch = charYaml?.match(/居住地[：:]\s*"?([^"\n]+)/);
   const charLoc = locMatch ? locMatch[1].trim() : null;
   return `Worldbuilder. Write in ${L(s.language)}. Generate country #${i + 1}/${s.countryCount}.
-WORLD:\n${world}\nNaming: ${s.namingStyle === "custom" ? s.customNamingText : (nm[s.namingStyle] || s.namingStyle)}, Cities: ${s.cityCount}
+WORLD:\n${world}\nNaming: ${s.namingStyle === "none" ? "自由發揮" : s.namingStyle === "custom" ? s.customNamingText : (nm[s.namingStyle] || s.namingStyle)}${s.cityCount > 0 ? `, Cities: ${s.cityCount}` : ", no cities needed"}
 ${i === 0 && charLoc ? `IMPORTANT: Include the main character's home「${charLoc}」as one of the cities in this country.` : ""}
 Wrap in tag with country name. YAML: 居民命名風格, 地理, 人口, 首都, 政府, 產業, 城市結構, 對外關係, 文化特色. DISTINCT.
 Do NOT use real-world names.${mod ? " Keep names normal and realistic." : ""} Output ONLY YAML.`;
@@ -386,10 +389,10 @@ function TavoGenerator() {
 
   const [worldStyleTags, setWorldStyleTags] = useState([]);
   const [customWorldTags, setCustomWorldTags] = useState([]);
-  const [namingStyle, setNamingStyle] = useState("mixed");
+  const [namingStyle, setNamingStyle] = useState("none");
   const [customNamingText, setCustomNamingText] = useState("");
-  const [countryCount, setCountryCount] = useState(3);
-  const [cityCount, setCityCount] = useState(2);
+  const [countryCount, setCountryCount] = useState(0);
+  const [cityCount, setCityCount] = useState(0);
   const [includeRaces, setIncludeRaces] = useState(false);
   const [selectedRaces, setSelectedRaces] = useState([]);
 
@@ -445,7 +448,10 @@ function TavoGenerator() {
     setGenerating(true); setError(""); setResult(null); setProgressPct(0);
     const s = { language: lang, charName, charGender, customGenderText, charAge, charRace, customRaceText, personalityTags, customPersonalityTags, backgroundMode, backgroundText, hasRomance, romanceDetails, specialMechanisms, charExtra, userRelationship, customRelationship, worldStyleTags, customWorldTags, namingStyle, customNamingText, countryCount, cityCount, includeRaces, selectedRaces, toneTags, customToneTags, firstMesMode, firstMesText, entryMode };
     const cfg = { provider:apiProvider, apiKey, model, customEndpoint, corsMode, corsProxy };
-    const total = 3 + s.countryCount + (s.includeRaces && s.selectedRaces.length > 0 ? 1 : 0) + npcSlots.length + 1;
+    const needWorld = (s.worldStyleTags.length + s.customWorldTags.length) > 0 || npcSlots.length > 0 || (s.includeRaces && s.selectedRaces.length > 0);
+    const skipFirst = s.firstMesMode === "skip";
+    const worldSteps = needWorld ? (1 + (s.countryCount || 0) + (s.includeRaces && s.selectedRaces.length > 0 ? 1 : 0) + npcSlots.length) : 0;
+    const total = 1 + worldSteps + (skipFirst ? 0 : 1) + 1;
     let done = 0;
     const tick = (msg) => { done++; setProgress(msg); setProgressPct(Math.round((done / total) * 100)); };
     try {
@@ -457,32 +463,35 @@ function TavoGenerator() {
         : `<character_info:{{char}}>\n${charRaw}\n</character_info:{{char}}>`;
       const eName = s.charName || (charRaw.match(/全名:\s*"?([^"(\n]+)/)?.[1]?.trim() || "角色");
 
-      tick(t.progressWorld);
-      const wRaw = await callAI(cfg, buildWorldPrompt(s, charContent));
-      const wm = wRaw.match(/<世界觀>([\s\S]*?)<\/世界觀>/);
-      const worldYaml = wm ? wm[0] : `<世界觀>\n${wRaw}\n</世界觀>`;
-      const we = [{ name: "——🌍世界觀🌍——", content: worldYaml, keys: [], selective: false }];
+      let worldYaml = ""; let we = [];
+      if (needWorld) {
+        tick(t.progressWorld);
+        const wRaw = await callAI(cfg, buildWorldPrompt(s, charContent));
+        const wm = wRaw.match(/<世界觀>([\s\S]*?)<\/世界觀>/);
+        worldYaml = wm ? wm[0] : `<世界觀>\n${wRaw}\n</世界觀>`;
+        we = [{ name: "——🌍世界觀🌍——", content: worldYaml, keys: [], selective: false }];
 
-      for (let i = 0; i < s.countryCount; i++) {
-        tick(`${t.progressCountry} (${i + 1}/${s.countryCount})`);
-        const cr = await callAI(cfg, buildCountryPrompt(s, worldYaml, i, charContent));
-        const crClean = cr.replace(/^```(?:yaml)?\n?/m, "").replace(/\n?```\s*$/m, "").trim();
-        const cm2 = crClean.match(/<([^/>\s]+)>([\s\S]*?)<\/\1>/);
-        let countryName = cm2 ? cm2[1] : (crClean.match(/^([^\s:：\n]+)\s*[:：]/m)?.[1] || `國家${i + 1}`);
-        const countryContent = cm2 ? cm2[0] : `<${countryName}>\n${crClean}\n</${countryName}>`;
-        we.push({ name: `🗺️${countryName}`, content: countryContent, keys: [], selective: false });
-      }
+        for (let i = 0; i < s.countryCount; i++) {
+          tick(`${t.progressCountry} (${i + 1}/${s.countryCount})`);
+          const cr = await callAI(cfg, buildCountryPrompt(s, worldYaml, i, charContent));
+          const crClean = cr.replace(/^```(?:yaml)?\n?/m, "").replace(/\n?```\s*$/m, "").trim();
+          const cm2 = crClean.match(/<([^/>\s]+)>([\s\S]*?)<\/\1>/);
+          let countryName = cm2 ? cm2[1] : (crClean.match(/^([^\s:：\n]+)\s*[:：]/m)?.[1] || `國家${i + 1}`);
+          const countryContent = cm2 ? cm2[0] : `<${countryName}>\n${crClean}\n</${countryName}>`;
+          we.push({ name: `🗺️${countryName}`, content: countryContent, keys: [], selective: false });
+        }
 
-      if (s.includeRaces && s.selectedRaces.length > 0) {
-        tick(t.progressRace);
-        const rr = await callAI(cfg, buildRacePrompt(s, worldYaml, s.selectedRaces), 12000);
-        const rm = [...rr.matchAll(/<([^/>\s]+)>([\s\S]*?)<\/\1>/g)];
-        const ov = rm.find(m => ["特殊種族", "特殊种族"].includes(m[1]));
-        if (ov) we.push({ name: "——💠特殊種族💠——", content: ov[0], keys: [], selective: false });
-        for (const r of rm) { if (["特殊種族", "特殊种族", "跨種族軼事", "跨种族轶事"].includes(r[1])) continue; const kw = s.entryMode === "auto"; we.push({ name: `📌${r[1]}`, content: r[0], keys: kw ? [r[1]] : [], selective: kw }); }
-        const cr = rm.find(m => ["跨種族軼事", "跨种族轶事"].includes(m[1]));
-        if (cr) we.push({ name: "📝跨種族軼事", content: cr[0], keys: [], selective: false });
-      }
+        if (s.includeRaces && s.selectedRaces.length > 0) {
+          tick(t.progressRace);
+          const rr = await callAI(cfg, buildRacePrompt(s, worldYaml, s.selectedRaces), 12000);
+          const rm = [...rr.matchAll(/<([^/>\s]+)>([\s\S]*?)<\/\1>/g)];
+          const ov = rm.find(m => ["特殊種族", "特殊种族"].includes(m[1]));
+          if (ov) we.push({ name: "——💠特殊種族💠——", content: ov[0], keys: [], selective: false });
+          for (const r of rm) { if (["特殊種族", "特殊种族", "跨種族軼事", "跨种族轶事"].includes(r[1])) continue; const kw = s.entryMode === "auto"; we.push({ name: `📌${r[1]}`, content: r[0], keys: kw ? [r[1]] : [], selective: kw }); }
+          const cr = rm.find(m => ["跨種族軼事", "跨种族轶事"].includes(m[1]));
+          if (cr) we.push({ name: "📝跨種族軼事", content: cr[0], keys: [], selective: false });
+        }
+      } // end needWorld
 
       const typeMap = { enemy: "仇人", friend: "朋友", family: "家人" };
       for (let i = 0; i < npcSlots.length; i++) {
@@ -510,8 +519,13 @@ function TavoGenerator() {
         we.push({ name: `${isCore ? "👤" : "👥"}${nName}`, content: nContent, keys: kw ? [nName] : [], selective: kw });
       }
 
-      tick(t.progressFirst);
-      const firstMes = await callAI(cfg, buildFirstMesPrompt(s, charContent, worldYaml));
+      let firstMes;
+      if (skipFirst) {
+        firstMes = lang === "en" ? "【Custom Opening】" : lang === "zh-CN" ? "【自定义开场白】" : "【自定義開場白】";
+      } else {
+        tick(t.progressFirst);
+        firstMes = await callAI(cfg, buildFirstMesPrompt(s, charContent, worldYaml));
+      }
 
       tick(t.progressAssemble);
       const tone = [...s.toneTags, ...s.customToneTags].join("、") || "自由發揮";
@@ -522,6 +536,7 @@ function TavoGenerator() {
   }, [lang, charName, charGender, customGenderText, charAge, charRace, customRaceText, personalityTags, customPersonalityTags, backgroundMode, backgroundText, hasRomance, romanceDetails, specialMechanisms, charExtra, userRelationship, customRelationship, worldStyleTags, customWorldTags, namingStyle, customNamingText, countryCount, cityCount, includeRaces, selectedRaces, toneTags, customToneTags, firstMesMode, firstMesText, entryMode, apiProvider, apiKey, model, customEndpoint, corsMode, corsProxy, npcSlots, coreNpcIds, t]);
 
   const [copied, setCopied] = useState(false);
+  const [showFaq, setShowFaq] = useState(false);
 
   const copyJSON = () => {
     if (!result) return;
@@ -618,7 +633,28 @@ select.tg-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
 .tg-g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.tg-mb{margin-bottom:10px}
 .tg-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .tg-note{font-size:11px;margin-top:6px;padding:4px 8px;border-radius:4px}
-.tg-note-warn{color:var(--ac);background:var(--ac-bg)}`;
+.tg-note-warn{color:var(--ac);background:var(--ac-bg)}
+.tg-guide{max-width:720px;margin:24px auto 0;padding:0 16px 40px}
+.tg-guide-inner{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:20px 24px;box-shadow:var(--shadow)}
+.tg-guide-title{font-size:14px;font-weight:700;color:var(--ac);margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.tg-guide-h2{font-size:12px;font-weight:700;color:var(--t);margin:14px 0 6px;text-transform:uppercase;letter-spacing:.5px}
+.tg-guide-p{font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:4px}
+.tg-guide-li{font-size:13px;color:var(--t2);line-height:1.7;padding-left:14px;position:relative}
+.tg-guide-li::before{content:"·";position:absolute;left:4px;color:var(--ac)}
+.tg-guide-tag{display:inline;font-size:11px;background:var(--ac-bg);color:var(--ac);border-radius:4px;padding:1px 6px;margin:0 2px;font-family:'JetBrains Mono',monospace}
+.tg-faq-btn{position:fixed;bottom:24px;right:20px;width:40px;height:40px;border-radius:50%;background:var(--ac);color:#fff;border:none;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.25);z-index:100;display:flex;align-items:center;justify-content:center;transition:opacity .15s}
+.tg-faq-btn:hover{opacity:.85}
+.tg-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
+.tg-faq-modal{background:var(--bg);border:1px solid var(--bd);border-radius:14px;width:100%;max-width:600px;max-height:80vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.35)}
+.tg-faq-hdr{padding:16px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.tg-faq-hdr-t{font-size:15px;font-weight:700;color:var(--t)}
+.tg-faq-close{width:28px;height:28px;border-radius:6px;border:1px solid var(--bd);background:var(--bg3);color:var(--t2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+.tg-faq-close:hover{color:var(--t);border-color:var(--ac-bd)}
+.tg-faq-body{overflow-y:auto;padding:16px 20px}
+.tg-faq-item{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--bd)}
+.tg-faq-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.tg-faq-q{font-size:13px;font-weight:600;color:var(--t);margin-bottom:6px}
+.tg-faq-a{font-size:13px;color:var(--t2);line-height:1.7}`;
 
   const pModels = PROVIDERS[apiProvider]?.models || [];
 
@@ -641,7 +677,7 @@ select.tg-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
         {stepContent(0, <div>
           <Section title={t.apiProvider}>
             <div className="tg-row tg-mb">{Object.entries(PROVIDERS).map(([k, v]) => <button key={k} onClick={() => { setApiProvider(k); setModel(""); }} className={`tg-btn ${apiProvider === k ? "on" : ""}`}>{v.label}</button>)}</div>
-            {apiProvider === "custom" && <div className="tg-mb"><label className="tg-label">{t.customEndpoint}</label><input value={customEndpoint} onChange={e => setCustomEndpoint(e.target.value)} placeholder="https://api.example.com/v1/chat/completions" className="tg-input" /></div>}
+            {apiProvider === "custom" && <div className="tg-mb"><label className="tg-label">{t.customEndpoint}</label><div style={{display:"flex",gap:6,alignItems:"flex-start"}}><input value={customEndpoint} onChange={e => setCustomEndpoint(e.target.value)} placeholder="https://api.example.com/v1/chat/completions" className="tg-input" /><button type="button" onClick={() => setCustomEndpoint(v => { const base = v.replace(/\/v1\/chat\/completions\s*$/, "").replace(/\/+$/, ""); return base + "/v1/chat/completions"; })} className="tg-mhb" style={{whiteSpace:"nowrap",flexShrink:0,padding:"6px 10px",fontSize:11,marginTop:1}}>點一下自動填入 /v1/chat/completions</button></div></div>}
             <div className="tg-mb"><label className="tg-label">{t.apiKey}<span className="tg-req">*</span></label><input value={apiKey} onChange={e => setApiKey(e.target.value)} placeholder={t.apiKeyPh} type="password" className="tg-input" /></div>
             <div><label className="tg-label">{t.model}<span className="tg-req">*</span></label><input value={model} onChange={e => setModel(e.target.value)} placeholder={t.modelPh} className="tg-input" />
               {pModels.length > 0 && <div className="tg-mh"><span className="tg-label-sm" style={{ marginRight: 2 }}>{t.modelHint}:</span>{pModels.map(m => <button key={m} onClick={() => setModel(m)} className="tg-mhb">{m}</button>)}</div>}
@@ -675,12 +711,14 @@ select.tg-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
           <Section title={t.userRelation}><select value={userRelationship} onChange={e => setUserRelationship(e.target.value)} className="tg-input">{Object.entries(t.relationOpts).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>{userRelationship === "custom" && <input value={customRelationship} onChange={e => setCustomRelationship(e.target.value)} placeholder={t.customRelation} className="tg-input" style={{ marginTop: 6 }} />}</Section>
         </div>)}
         {stepContent(3, <div>
+          <p className="tg-note tg-note-warn" style={{marginBottom:12}}>{t.worldNote}</p>
           <Section title={t.worldStyle}><TagSelector tags={t.worldTags} selected={worldStyleTags} onToggle={toggleWorldStyle} customTags={customWorldTags} onAddCustom={addCustomW} onRemoveCustom={removeCustomW} placeholder={t.customWorldPh} /></Section>
           <Section title={t.namingStyle}><select value={namingStyle} onChange={e => setNamingStyle(e.target.value)} className="tg-input">{Object.entries(t.namingOpts).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>{namingStyle === "custom" && <input value={customNamingText} onChange={e => setCustomNamingText(e.target.value)} placeholder={t.customNaming} className="tg-input" style={{ marginTop: 6 }} />}</Section>
-          <div className="tg-g2"><Section title={t.countryCount}><NumInput value={countryCount} onChange={setCountryCount} min={1} max={10} /></Section><Section title={t.cityCount}><NumInput value={cityCount} onChange={setCityCount} min={1} max={10} /></Section></div>
+          <div className="tg-g2"><Section title={t.countryCount}><NumInput value={countryCount} onChange={setCountryCount} min={0} max={10} /></Section><Section title={t.cityCount}><NumInput value={cityCount} onChange={setCityCount} min={0} max={10} /></Section></div>
           <Section title={t.includeRaces}><Toggle checked={includeRaces} onChange={setIncludeRaces} label={t.includeRaces} />{includeRaces && <div style={{ marginTop: 10 }}><TagSelector tags={t.worldRaceTags} selected={selectedRaces} onToggle={toggleRace} customTags={[]} onAddCustom={() => { }} onRemoveCustom={() => { }} placeholder="" /></div>}</Section>
         </div>)}
         {stepContent(4, <div>
+          <p className="tg-note tg-note-warn" style={{marginBottom:12}}>{t.npcNote}</p>
           <Section title={t.enemies}><div className="tg-row"><NumInput value={enemyMale} onChange={setEnemyMale} label={t.maleCount} /><NumInput value={enemyFemale} onChange={setEnemyFemale} label={t.femaleCount} /></div></Section>
           <Section title={t.friends}><div className="tg-row"><NumInput value={friendMale} onChange={setFriendMale} label={t.maleCount} /><NumInput value={friendFemale} onChange={setFriendFemale} label={t.femaleCount} /></div></Section>
           <Section title={t.family}><div className="tg-row tg-mb"><Toggle checked={hasFather} onChange={setHasFather} label={t.father} /><Toggle checked={hasMother} onChange={setHasMother} label={t.mother} /></div><div className="tg-row"><NumInput value={brotherCount} onChange={setBrotherCount} label={t.brother} max={5} /><NumInput value={sisterCount} onChange={setSisterCount} label={t.sister} max={5} /></div></Section>
@@ -688,7 +726,7 @@ select.tg-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
         </div>)}
         {stepContent(5, <div>
           <Section title={t.toneTitle}><TagSelector tags={t.toneTags} selected={toneTags} onToggle={toggleTone} customTags={customToneTags} onAddCustom={addCustomT} onRemoveCustom={removeCustomT} placeholder={t.customTonePh} /></Section>
-          <Section title={t.firstMes}><div className="tg-row tg-mb"><button onClick={() => setFirstMesMode("auto")} className={`tg-btn ${firstMesMode === "auto" ? "on" : ""}`}>{t.fmAuto}</button><button onClick={() => setFirstMesMode("custom")} className={`tg-btn ${firstMesMode === "custom" ? "on" : ""}`}>{t.fmCustom}</button></div>{firstMesMode === "custom" && <><textarea value={firstMesText} onChange={e => setFirstMesText(e.target.value)} placeholder={t.fmPh} className="tg-input" rows={4} /><VarBtn onInsert={v => setFirstMesText(p => p + v)} /></>}</Section>
+          <Section title={t.firstMes}><div className="tg-row tg-mb"><button onClick={() => setFirstMesMode("auto")} className={`tg-btn ${firstMesMode === "auto" ? "on" : ""}`}>{t.fmAuto}</button><button onClick={() => setFirstMesMode("custom")} className={`tg-btn ${firstMesMode === "custom" ? "on" : ""}`}>{t.fmCustom}</button><button onClick={() => setFirstMesMode("skip")} className={`tg-btn ${firstMesMode === "skip" ? "on" : ""}`}>{t.fmSkip}</button></div>{firstMesMode === "custom" && <><textarea value={firstMesText} onChange={e => setFirstMesText(e.target.value)} placeholder={t.fmPh} className="tg-input" rows={4} /><VarBtn onInsert={v => setFirstMesText(p => p + v)} /></>}{firstMesMode === "skip" && <p className="tg-note tg-note-warn">{lang==="en"?"Opening will be set to 【Custom Opening】 — edit after import.":lang==="zh-CN"?"开场白将直接填入【自定义开场白】，匯入後可自行修改。":"開場白將直接填入【自定義開場白】，匯入後可自行修改。"}</p>}</Section>
           <Section title={t.entryMode}><div className="tg-row"><button onClick={() => setEntryMode("all_constant")} className={`tg-btn ${entryMode === "all_constant" ? "on" : ""}`}>{t.entryAllConst}</button><button onClick={() => setEntryMode("auto")} className={`tg-btn ${entryMode === "auto" ? "on" : ""}`}>{t.entryAuto}</button></div></Section>
         </div>)}
         {stepContent(6, <div>
@@ -707,6 +745,94 @@ select.tg-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
       </div>
       {step < 6 && <div className="tg-nav"><button onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0} className="tg-btn" style={{ padding: "8px 20px", opacity: step === 0 ? .3 : 1 }}>{t.back}</button><button onClick={() => setStep(Math.min(6, step + 1))} className="tg-btn tg-btn-p" style={{ padding: "8px 20px" }}>{t.next}</button></div>}
     </div>
+
+    {/* 使用說明 */}
+    <div className="tg-guide">
+      <div className="tg-guide-inner">
+        <div className="tg-guide-title">📖 {lang === "en" ? "Guide" : lang === "zh-CN" ? "使用说明" : "使用說明"}</div>
+        {lang === "en" ? (<div>
+          <p className="tg-guide-p">Tool URL: <span className="tg-guide-tag">https://algae1217aglae-ui.github.io/tavo-generator/</span></p>
+          <p className="tg-guide-p" style={{marginTop:6}}>You need your own API key from any supported AI service.</p>
+          <p className="tg-guide-h2">Step 1 — API Setup</p>
+          <p className="tg-guide-li">Select your provider and enter your API key. It stays local in your browser only.</p>
+          <p className="tg-guide-li">Click a model shortcut or enter the model name manually.</p>
+          <p className="tg-guide-li">DeepSeek, OpenAI, and Grok require a proxy to work in the browser.</p>
+          <p className="tg-guide-li">For Custom providers, the endpoint must end in <span className="tg-guide-tag">/v1/chat/completions</span>.</p>
+          <p className="tg-guide-h2">Connection Mode</p>
+          <p className="tg-guide-li"><b>Direct</b> — Claude and Gemini only.</p>
+          <p className="tg-guide-li"><b>Built-in Proxy</b> — Routes through my private server. I don't log anything, but your key does pass through a third party. Ask an AI to help you set up your own if you prefer.</p>
+          <p className="tg-guide-li"><b>Custom Proxy</b> — Enter your own CORS proxy URL.</p>
+          <p className="tg-guide-h2">Steps 2 onward</p>
+          <p className="tg-guide-p">Fill in character info, world, NPCs, and opening. Then hit Generate. Download the JSON and import it into SillyTavern or Tavo.</p>
+        </div>) : lang === "zh-CN" ? (<div>
+          <p className="tg-guide-p">工具网址：<span className="tg-guide-tag">https://algae1217aglae-ui.github.io/tavo-generator/</span></p>
+          <p className="tg-guide-p" style={{marginTop:6}}>使用前需要自备任一 AI 服务的 API Key。</p>
+          <p className="tg-guide-h2">第一步：填写 API 设定</p>
+          <p className="tg-guide-li">API 供应商：选择你使用的服务</p>
+          <p className="tg-guide-li">API 密钥：填入你的 Key，<b>仅在你的浏览器本地使用，不会上传任何服务器</b></p>
+          <p className="tg-guide-li">模型名称：点下方快速填入按钮，或到平台官网复制正确的模型名称</p>
+          <p className="tg-guide-li">DeepSeek、OpenAI、Grok 等供应商需要选择代理才能在浏览器使用</p>
+          <p className="tg-guide-li">使用 Custom 供应商时，端点后面需要有 <span className="tg-guide-tag">/v1/chat/completions</span></p>
+          <p className="tg-guide-h2">关于连线方式</p>
+          <p className="tg-guide-li"><b>直连</b>：仅 Claude、Gemini 可用</p>
+          <p className="tg-guide-li"><b>内建代理</b>：使用我自己搭建的中转服务器，我不会主动记录任何内容，但如果你介意 API Key 经过第三方服务器，可以请 AI 教你搭建自己的代理，选「自定义代理」填入即可</p>
+          <p className="tg-guide-li"><b>自定义代理</b>：填入你自己的 CORS proxy 网址</p>
+          <p className="tg-guide-h2">第二步以后</p>
+          <p className="tg-guide-p">依序填写角色资讯、世界观、NPC、开场白等设定，最后按「开始生成」，完成后下载 JSON 导入 SillyTavern 或 Tavo 即可使用。</p>
+        </div>) : (<div>
+          <p className="tg-guide-p">工具網址：<span className="tg-guide-tag">https://algae1217aglae-ui.github.io/tavo-generator/</span></p>
+          <p className="tg-guide-p" style={{marginTop:6}}>使用前需要自備任一 AI 服務的 API Key。</p>
+          <p className="tg-guide-h2">第一步：填寫 API 設定</p>
+          <p className="tg-guide-li">API 供應商：選擇你使用的服務</p>
+          <p className="tg-guide-li">API 金鑰：填入你的 Key，<b>僅在你的瀏覽器本地使用，不會上傳任何伺服器</b></p>
+          <p className="tg-guide-li">模型名稱：點下方快速填入按鈕，或到平台官網複製正確的模型名稱</p>
+          <p className="tg-guide-li">DeepSeek、OpenAI、Grok 等供應商需要選擇代理才能在瀏覽器使用</p>
+          <p className="tg-guide-li">使用 Custom 供應商時，端點後面需要有 <span className="tg-guide-tag">/v1/chat/completions</span></p>
+          <p className="tg-guide-h2">關於連線方式</p>
+          <p className="tg-guide-li"><b>直連</b>：僅 Claude、Gemini 可用</p>
+          <p className="tg-guide-li"><b>內建代理</b>：使用我自己搭建的中轉伺服器，我不會主動記錄任何內容，但如果你介意 API Key 經過第三方伺服器，可以請 AI 教你搭建自己的代理，選「自訂代理」填入即可</p>
+          <p className="tg-guide-li"><b>自訂代理</b>：填入你自己的 CORS proxy 網址</p>
+          <p className="tg-guide-h2">第二步以後</p>
+          <p className="tg-guide-p">依序填寫角色資訊、世界觀、NPC、開場白等設定，最後按「開始生成」，完成後下載 JSON 匯入 SillyTavern 或 Tavo 即可使用。</p>
+        </div>)}
+      </div>
+    </div>
+
+    {/* FAQ 浮動按鈕 */}
+    <button className="tg-faq-btn" onClick={() => setShowFaq(true)} title="常見問題">?</button>
+
+    {/* FAQ 彈窗 */}
+    {showFaq && <div className="tg-overlay" onClick={e => { if(e.target === e.currentTarget) setShowFaq(false); }}>
+      <div className="tg-faq-modal">
+        <div className="tg-faq-hdr">
+          <span className="tg-faq-hdr-t">{lang === "en" ? "FAQ" : lang === "zh-CN" ? "常见问题" : "常見問題"}</span>
+          <button className="tg-faq-close" onClick={() => setShowFaq(false)}>✕</button>
+        </div>
+        <div className="tg-faq-body">
+          {lang === "en" ? (<>
+            <div className="tg-faq-item"><p className="tg-faq-q">Is my API key safe?</p><p className="tg-faq-a">Yes. Your key is stored only in your browser memory and is never sent to any server other than the AI provider (or proxy if you use one). Closing the tab clears it.</p></div>
+            <div className="tg-faq-item"><p className="tg-faq-q">Why can't I use DeepSeek / OpenAI / Grok directly?</p><p className="tg-faq-a">These providers don't allow direct browser requests (CORS policy). You need to use a proxy — either the built-in one or your own.</p></div>
+            <div className="tg-faq-item"><p className="tg-faq-q">What does the built-in proxy do?</p><p className="tg-faq-a">It's a private Cloudflare Worker I run that forwards your request to the AI provider. It adds the necessary CORS headers and passes your key through unchanged. I don't log request content.</p></div>
+            <div className="tg-faq-item"><p className="tg-faq-q">How do I set up my own proxy?</p><p className="tg-faq-a">Create a free Cloudflare account, make a Worker with the pass-through code (ask an AI for help), deploy it, and paste the URL into Custom Proxy.</p></div>
+            <div className="tg-faq-item"><p className="tg-faq-q">Generation failed / API error — what should I do?</p><p className="tg-faq-a">Check your API key and model name. If using DeepSeek/OpenAI/Grok, make sure you've selected a proxy. Also check your account has enough credits.</p></div>
+          </>) : lang === "zh-CN" ? (<>
+            <div className="tg-faq-item"><p className="tg-faq-q">我的 API Key 安全吗？</p><p className="tg-faq-a">安全。你的 Key 只存在浏览器内存中，只会直接发送给 AI 供应商（若使用代理则会经过代理）。关闭页面后即消失，不会储存到任何地方。</p></div>
+            <div className="tg-faq-item"><p className="tg-faq-q">为什么 DeepSeek / OpenAI / Grok 没办法直连？</p><p className="tg-faq-a">这些供应商的 API 不允许浏览器直接请求（CORS 政策限制），需要透过代理中转。选择「内建代理」或设定自己的代理即可。</p></div>
+            <div className="tg-faq-item"><p className="tg-faq-q">内建代理是什么？安全吗？</p><p className="tg-faq-a">是我自己用 Cloudflare Worker 搭的中转服务器，只做转发，不记录任何请求内容。你的 API Key 会经过这个服务器，但不会被储存。如果不放心，可以请 AI 帮你自己搭一个，选「自定义代理」填入即可。</p></div>
+            <div className="tg-faq-item"><p className="tg-faq-q">模型名称要填什么？</p><p className="tg-faq-a">点「常用模型」下方的快捷按钮可以自动填入。若要用其他模型，请到你使用的平台官网或文档确认正确的模型字符串（例如 gpt-4o、deepseek-chat）。</p></div>
+            <div className="tg-faq-item"><p className="tg-faq-q">生成失败 / API 报错怎么办？</p><p className="tg-faq-a">请确认 API Key 和模型名称是否正确。DeepSeek / OpenAI / Grok 记得选代理。也请确认你的账户有足够余额，以及模型名称拼写无误。</p></div>
+            <div className="tg-faq-item"><p className="tg-faq-q">怎么自己搭 CORS 代理？</p><p className="tg-faq-a">申请免费的 Cloudflare 账号，创建一个 Worker 并粘贴转发代码（可以直接问 AI），部署后把 URL 填入「自定义代理」栏位即可。</p></div>
+          </>) : (<>
+            <div className="tg-faq-item"><p className="tg-faq-q">我的 API Key 安全嗎？</p><p className="tg-faq-a">安全。你的 Key 只存在瀏覽器記憶體中，只會直接傳送給 AI 供應商（若使用代理則會經過代理）。關閉頁面後即消失，不會存到任何地方。</p></div>
+            <div className="tg-faq-item"><p className="tg-faq-q">為什麼 DeepSeek / OpenAI / Grok 沒辦法直連？</p><p className="tg-faq-a">這些供應商的 API 不允許瀏覽器直接請求（CORS 政策限制），需要透過代理中轉。選擇「內建代理」或設定自己的代理即可。</p></div>
+            <div className="tg-faq-item"><p className="tg-faq-q">內建代理是什麼？安全嗎？</p><p className="tg-faq-a">是我自己用 Cloudflare Worker 架的中轉伺服器，只做轉發，不記錄任何請求內容。你的 API Key 會經過這個伺服器，但不會被儲存。如果不放心，可以請 AI 幫你自己架一個，選「自訂代理」填入即可。</p></div>
+            <div className="tg-faq-item"><p className="tg-faq-q">模型名稱要填什麼？</p><p className="tg-faq-a">點「常用模型」下方的快捷按鈕可以自動填入。若要用其他模型，請到你使用的平台官網或文件確認正確的模型字串（例如 gpt-4o、deepseek-chat）。</p></div>
+            <div className="tg-faq-item"><p className="tg-faq-q">生成失敗 / API 錯誤怎麼辦？</p><p className="tg-faq-a">請確認 API Key 和模型名稱是否正確。DeepSeek / OpenAI / Grok 記得選代理。也請確認你的帳戶有足夠餘額，以及模型名稱拼寫無誤。</p></div>
+            <div className="tg-faq-item"><p className="tg-faq-q">怎麼自己架 CORS 代理？</p><p className="tg-faq-a">申請免費的 Cloudflare 帳號，建立一個 Worker 並貼上轉發程式碼（可以直接問 AI），部署後把 URL 填入「自訂代理」欄位即可。</p></div>
+          </>)}
+        </div>
+      </div>
+    </div>}
   </div>);
 }
 
