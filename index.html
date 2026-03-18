@@ -12,8 +12,8 @@
   <script src="https://unpkg.com/@babel/standalone@7.23.2/babel.min.js"></script>
   <script type="text/babel">
 const { useState, useCallback, useMemo, memo } = React;
-
-
+ 
+ 
 /* ══════════════════════════ i18n ══════════════════════════ */
 const T = {
   "zh-TW": {
@@ -164,7 +164,7 @@ const T = {
     modelHint: "Models", enemyM: "Enemy♂", enemyF: "Enemy♀", friendM: "Friend♂", friendF: "Friend♀",
   },
 };
-
+ 
 /* ══════════════════════ Providers ══════════════════════ */
 const PROVIDERS = {
   anthropic:{label:"Anthropic",endpoint:"https://api.anthropic.com/v1/messages",models:["claude-sonnet-4-6","claude-opus-4-6","claude-haiku-4-5-20251001"],corsOk:true},
@@ -183,20 +183,20 @@ function makeUrl(url, corsMode, corsProxy) {
   }
   return url;
 }
-
+ 
 async function doFetch(url, opts, corsMode, corsProxy) {
   const primary = makeUrl(url, corsMode, corsProxy);
   try {
     const res = await fetch(primary, opts);
     return res;
   } catch (err) {
-
+ 
     throw new Error(corsMode === "direct"
       ? "Failed to fetch — 此供應商可能不支援瀏覽器直連（CORS），請在 API 設定中切換為「內建代理」或「自訂代理」"
       : "Failed to fetch — 代理連線失敗，請嘗試其他代理或自訂代理");
   }
 }
-
+ 
 async function callAI(cfg, prompt, maxTokens = 8192) {
   const { provider, apiKey, model, customEndpoint, corsMode, corsProxy } = cfg;
   try {
@@ -230,13 +230,13 @@ async function callAI(cfg, prompt, maxTokens = 8192) {
     return data.choices?.[0]?.message?.content || "";
   } catch (e) { throw new Error(`API Error: ${e.message}`); }
 }
-
+ 
 /* ══════════════════ Prompts ══════════════════ */
 const L = (l) => l === "en" ? "English" : l === "zh-CN" ? "Simplified Chinese" : "Traditional Chinese";
-
+ 
 const _modern = ["現代","现代","Modern","校園","校园","Campus","日常","Slice of Life","都市異能","都市异能","Urban Supernatural"];
 const isModern = (tags) => tags.some(t => _modern.includes(t));
-
+ 
 function buildCharPrompt(s) {
   const p = [...s.personalityTags, ...s.customPersonalityTags].join("、");
   const bg = s.backgroundMode === "auto" ? "由你自由發揮" : `概述：\n${s.backgroundText}`;
@@ -247,7 +247,7 @@ function buildCharPrompt(s) {
   const worldTags = [...s.worldStyleTags, ...s.customWorldTags];
   const hasWorld = worldTags.length > 0;
   return `You are a master character writer for roleplay cards (Tavo/SillyTavern). Write in ${L(s.language)}.
-
+ 
 Generate a complete character profile in YAML. Parameters:
 - Name: ${s.charName || "(generate based on naming style: " + s.namingStyle + ")"}
 - Gender: ${s.charGender === "custom" ? s.customGenderText : s.charGender} (CRITICAL: strictly follow this gender in ALL descriptions, pronouns, and writing)
@@ -257,17 +257,17 @@ Generate a complete character profile in YAML. Parameters:
 - Relationship with {{user}}: ${rel}
 ${s.charExtra ? `- Additional notes: ${s.charExtra}` : ""}
 ${hasWorld ? `- World style: ${worldTags.join("、")} — CRITICAL: ALL details (clothing, technology, lifestyle, speech, occupation) MUST match this world style. No anachronistic elements.` : ""}
-
+ 
 Wrap in <character_info:{{char}}>. YAML sections: 基本資料, 外貌與體態, 性格 (LIVING PROSE with anecdotes), 語癖與說話習慣 (with dialogue examples), 興趣愛好, 童年與過往.
 Use > for prose, quotes for short values. THREE-DIMENSIONAL with flaws and charm.
-
+ 
 CRITICAL WORLD RULES:
 - The character's 居住地/國籍 must include a specific FICTIONAL city name and country name.
 - Do NOT use real-world country or city names (no Tokyo, New York, Paris, etc.) unless the user explicitly wrote them in their input above.
 ${mod ? "- This is a MODERN/DAILY setting: use NORMAL realistic-sounding fictional names (e.g. 槐安市、楓橋鎮), NOT fantastical or sci-fi names. Keep everything grounded." : "- Create distinctive fictional names fitting the world style."}
 Output ONLY the YAML inside the tags.`;
 }
-
+ 
 function buildWorldPrompt(s, charYaml) {
   const styles = [...s.worldStyleTags, ...s.customWorldTags].join("、");
   const nm = { cn: "中式", jp: "日式", west: "西歐式", nordic: "北歐式", ru: "俄式", arabic: "阿拉伯式", mixed: "混合" };
@@ -278,14 +278,14 @@ function buildWorldPrompt(s, charYaml) {
 Style: ${styles} | Naming: ${s.namingStyle === "none" ? "自由發揮" : s.namingStyle === "custom" ? s.customNamingText : (nm[s.namingStyle] || s.namingStyle)}
 ${s.countryCount > 0 ? `Countries: ${s.countryCount}` : "No countries needed — world overview only."}${s.cityCount > 0 ? `, Cities/country: ${s.cityCount}` : ""}
 ${charLoc ? `IMPORTANT: The main character lives in「${charLoc}」. This location MUST exist in the world.` : ""}
-
+ 
 RULES:
 - Wrap in <世界觀>. Include: 世界總覽 (name, era, geography, tech), history, systems, dynamics.
 - Do NOT use real-world names unless user specified them.
 ${mod ? "- MODERN/DAILY setting: keep everything grounded, realistic. Normal city names, no fantastical elements. Focus on everyday society." : "- Create distinctive atmosphere and terminology fitting the genre."}
 Output ONLY YAML.`;
 }
-
+ 
 function buildCountryPrompt(s, world, i, charYaml) {
   const nm = { cn: "中式", jp: "日式", west: "西歐式", nordic: "北歐式", ru: "俄式", arabic: "阿拉伯式", mixed: "混合" };
   const mod = isModern([...s.worldStyleTags, ...s.customWorldTags]);
@@ -297,15 +297,15 @@ ${i === 0 && charLoc ? `IMPORTANT: Include the main character's home「${charLoc
 Wrap in tag with country name. YAML: 居民命名風格, 地理, 人口, 首都, 政府, 產業, 城市結構, 對外關係, 文化特色. DISTINCT.
 Do NOT use real-world names.${mod ? " Keep names normal and realistic." : ""} Output ONLY YAML.`;
 }
-
+ 
 function buildRacePrompt(s, world, races) {
   return `Worldbuilder. Write in ${L(s.language)}. Generate race entries.
 WORLD:\n${world.substring(0, 2000)}\nRACES: ${races.join(", ")}
 Each race in own tag. YAML: 源流, 外觀與偽裝, 融入程度, 聚集地, 生活方式, 日常困擾 (humorous), 群組名言.
 Also: <特殊種族> overview + <跨種族軼事>. Output ONLY YAML.`;
 }
-
-
+ 
+ 
 function buildNpcPrompt(s, world, charY, type, spec, isCore) {
   const d = isCore
     ? "FULL: 基本資料, 外貌與體態, 性格 (anecdotes), 語癖 (dialogue), 與{{char}}的關係 (memories). Rich prose."
@@ -317,10 +317,10 @@ WORLD: ${world.substring(0, 1500)}\nMAIN CHAR: ${charY.substring(0, 1500)}
 NPC: ${type} (${spec}) | Detail: ${d}
 ${npcHasWorld ? `CRITICAL: World style is 「${npcWorldTags.join("、")}」. ALL NPC details MUST match this world logic. No anachronistic elements.` : ""}
 NPC must live in the SAME world. Use locations from the world setting.
-Wrap in <character_info:NPC名字>. YAML. Distinct voice. Output ONLY YAML.\`;
+Wrap in <character_info:NPC名字>. YAML. Distinct voice. Output ONLY YAML.`;
 }
-
-
+ 
+ 
 function buildFirstMesPrompt(s, charY, world) {
   const tones = [...s.toneTags, ...s.customToneTags].join("、");
   const inst = s.firstMesMode === "auto" ? "自由發揮引人入勝的開場" : `基於：\n${s.firstMesText}`;
@@ -328,7 +328,7 @@ function buildFirstMesPrompt(s, charY, world) {
 CHAR: ${charY.substring(0, 2000)}\nWORLD: ${world.substring(0, 1500)}\nTONE: ${tones}\n${inst}
 Third person for char, second for {{user}}. Vivid scene using locations FROM the world setting. 400-800 chars. Use {{user}}/{{char}}. Output ONLY narrative.`;
 }
-
+ 
 /* ══════════════════ Assembler ══════════════════ */
 function makeExt() {
   return { selectiveLogic: 0, position: 0, depth: 4, role: 0, match_whole_words: true, probability: 100, useProbability: true, sticky: 0, cooldown: 0, delay: 0, exclude_recursion: false, prevent_recursion: false, delay_until_recursion: false, group: "", group_override: false, group_weight: 100, use_group_scoring: false, scan_depth: 2, case_sensitive: false, automation_id: "", vectorized: false };
@@ -339,20 +339,20 @@ function assemble(name, desc, firstMes, we, tone) {
   we.forEach((e) => { entries.push({ keys: e.keys || [], content: e.content, extensions: makeExt(), enabled: true, use_regex: false, insertion_order: 100 - di, id: id++, name: e.name, comment: e.name, selective: e.selective || false, case_sensitive: false, constant: !e.selective, position: "before_char", display_index: di++ }); });
   return { spec: "chara_card_v3", spec_version: "3.0", data: { avatar: "", name, description: desc, first_mes: firstMes, personality: "", scenario: "", mes_example: "", creator_notes: "", system_prompt: "", post_history_instructions: "", alternate_greetings: null, character_book: { name: "", entries }, tags: [], creator: "", character_version: "", nickname: "", creator_notes_multilingual: {}, source: [], group_only_greetings: [], creation_date: Date.now(), modification_date: Date.now(), extensions: {} } };
 }
-
+ 
 /* ══════════════════ Components ══════════════════ */
-
+ 
 const VarBtn = ({ onInsert }) => (
   <div style={{ display: "flex", gap: 4, marginTop: 4 }}>
     <button type="button" onClick={() => onInsert("{{user}}")} className="tg-mhb">{"{{user}}"}</button>
     <button type="button" onClick={() => onInsert("{{char}}")} className="tg-mhb">{"{{char}}"}</button>
   </div>
 );
-
+ 
 function insertAtCursor(setter, currentValue, text) {
   setter(currentValue + text);
 }
-
+ 
 const TagSelector = memo(function TagSelector({ tags, selected, onToggle, customTags, onAddCustom, onRemoveCustom, placeholder }) {
   const [input, setInput] = useState("");
   return (<div>
@@ -363,17 +363,17 @@ const TagSelector = memo(function TagSelector({ tags, selected, onToggle, custom
     {placeholder && <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && input.trim()) { e.preventDefault(); onAddCustom(input.trim()); setInput(""); } }} placeholder={placeholder} className="tg-input" style={{ marginTop: 4 }} />}
   </div>);
 });
-
+ 
 const NumInput = memo(function NumInput({ value, onChange, min = 0, max = 20, label }) {
   return (<div style={{ display: "flex", alignItems: "center", gap: 6 }}>
     {label && <span className="tg-label-sm">{label}</span>}
     <div className="tg-num"><button onClick={() => onChange(Math.max(min, value - 1))}>−</button><span>{value}</span><button onClick={() => onChange(Math.min(max, value + 1))}>+</button></div>
   </div>);
 });
-
+ 
 const Section = ({ title, children }) => (<div className="tg-sec"><div className="tg-sec-t"><div className="tg-sec-l" /><span>{title}</span><div className="tg-sec-l" /></div>{children}</div>);
 const Toggle = memo(({ checked, onChange, label }) => (<div className="tg-tog" onClick={() => onChange(!checked)}><div className={`tg-tog-tr ${checked ? "on" : "off"}`}><div className="tg-tog-th" style={{ left: checked ? 18 : 2 }} /></div><span style={{ fontSize: 13, color: "var(--t2)" }}>{label}</span></div>));
-
+ 
 /* ══════════════════════ MAIN ══════════════════════ */
 function TavoGenerator() {
   const [theme, setTheme] = useState("dark");
@@ -381,14 +381,14 @@ function TavoGenerator() {
   const [lang, setLang] = useState("zh-TW");
   const t = T[lang];
   const isDark = theme === "dark";
-
+ 
   const [apiProvider, setApiProvider] = useState("anthropic");
   const [apiKey, setApiKey] = useState("");
   const [model, setModel] = useState("");
   const [customEndpoint, setCustomEndpoint] = useState("");
   const [corsMode, setCorsMode] = useState("direct");
   const [corsProxy, setCorsProxy] = useState("");
-
+ 
   const [charName, setCharName] = useState("");
   const [charGender, setCharGender] = useState("male");
   const [customGenderText, setCustomGenderText] = useState("");
@@ -397,7 +397,7 @@ function TavoGenerator() {
   const [customRaceText, setCustomRaceText] = useState("");
   const [personalityTags, setPersonalityTags] = useState([]);
   const [customPersonalityTags, setCustomPersonalityTags] = useState([]);
-
+ 
   const [backgroundMode, setBackgroundMode] = useState("auto");
   const [backgroundText, setBackgroundText] = useState("");
   const [hasRomance, setHasRomance] = useState(false);
@@ -406,7 +406,7 @@ function TavoGenerator() {
   const [charExtra, setCharExtra] = useState("");
   const [userRelationship, setUserRelationship] = useState("stranger");
   const [customRelationship, setCustomRelationship] = useState("");
-
+ 
   const [worldStyleTags, setWorldStyleTags] = useState([]);
   const [customWorldTags, setCustomWorldTags] = useState([]);
   const [namingStyle, setNamingStyle] = useState("none");
@@ -415,7 +415,7 @@ function TavoGenerator() {
   const [cityCount, setCityCount] = useState(0);
   const [includeRaces, setIncludeRaces] = useState(false);
   const [selectedRaces, setSelectedRaces] = useState([]);
-
+ 
   const [enemyMale, setEnemyMale] = useState(0);
   const [enemyFemale, setEnemyFemale] = useState(0);
   const [friendMale, setFriendMale] = useState(0);
@@ -425,20 +425,20 @@ function TavoGenerator() {
   const [siblings, setSiblings] = useState([]);
   const [coreNpcIds, setCoreNpcIds] = useState(new Set());
   const [npcNames, setNpcNames] = useState({});
-
+ 
   const [toneTags, setToneTags] = useState([]);
   const [customToneTags, setCustomToneTags] = useState([]);
   const [firstMesMode, setFirstMesMode] = useState("auto");
   const [firstMesText, setFirstMesText] = useState("");
   const [entryMode, setEntryMode] = useState("auto");
-
+ 
   const [generating, setGenerating] = useState(false);
   const [progress, setProgress] = useState("");
   const [progressPct, setProgressPct] = useState(0);
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
   const [previewTab, setPreviewTab] = useState("desc");
-
+ 
   const npcSlots = useMemo(() => {
     const s = [];
     for (let i = 0; i < enemyMale; i++) s.push({ id: `em${i}`, type: "enemy", gender: "M", label: t.enemyM + ` ${i + 1}` });
@@ -458,7 +458,7 @@ function TavoGenerator() {
     });
     return s;
   }, [enemyMale, enemyFemale, friendMale, friendFemale, hasFather, hasMother, siblings, t]);
-
+ 
   const togglePersonality = useCallback(tag => setPersonalityTags(p => p.includes(tag)?p.filter(x=>x!==tag):[...p,tag]), []);
   const addCustomP = useCallback(tag => setCustomPersonalityTags(p=>[...p,tag]), []);
   const removeCustomP = useCallback(tag => setCustomPersonalityTags(p=>p.filter(x=>x!==tag)), []);
@@ -470,7 +470,7 @@ function TavoGenerator() {
   const addCustomT = useCallback(tag => setCustomToneTags(p=>[...p,tag]), []);
   const removeCustomT = useCallback(tag => setCustomToneTags(p=>p.filter(x=>x!==tag)), []);
   const toggleCore = useCallback(id => setCoreNpcIds(prev => { const n = new Set(prev); n.has(id)?n.delete(id):n.add(id); return n; }), []);
-
+ 
   const handleGenerate = useCallback(async () => {
     setGenerating(true); setError(""); setResult(null); setProgressPct(0);
     const s = { language: lang, charName, charGender, customGenderText, charAge, charRace, customRaceText, personalityTags, customPersonalityTags, backgroundMode, backgroundText, hasRomance, romanceDetails, specialMechanisms, charExtra, userRelationship, customRelationship, worldStyleTags, customWorldTags, namingStyle, customNamingText, countryCount, cityCount, includeRaces, selectedRaces, toneTags, customToneTags, firstMesMode, firstMesText, entryMode };
@@ -489,7 +489,7 @@ function TavoGenerator() {
         ? `<character_info:{{char}}>${cm[1]}</character_info:{{char}}>`
         : `<character_info:{{char}}>\n${charRaw}\n</character_info:{{char}}>`;
       const eName = s.charName || (charRaw.match(/全名:\s*"?([^"(\n]+)/)?.[1]?.trim() || "角色");
-
+ 
       let worldYaml = ""; let we = [];
       if (needWorld) {
         tick(t.progressWorld);
@@ -497,7 +497,7 @@ function TavoGenerator() {
         const wm = wRaw.match(/<世界觀>([\s\S]*?)<\/世界觀>/);
         worldYaml = wm ? wm[0] : `<世界觀>\n${wRaw}\n</世界觀>`;
         we = [{ name: "——🌍世界觀🌍——", content: worldYaml, keys: [], selective: false }];
-
+ 
         for (let i = 0; i < s.countryCount; i++) {
           tick(`${t.progressCountry} (${i + 1}/${s.countryCount})`);
           const cr = await callAI(cfg, buildCountryPrompt(s, worldYaml, i, charContent));
@@ -507,7 +507,7 @@ function TavoGenerator() {
           const countryContent = cm2 ? cm2[0] : `<${countryName}>\n${crClean}\n</${countryName}>`;
           we.push({ name: `🗺️${countryName}`, content: countryContent, keys: [], selective: false });
         }
-
+ 
         if (s.includeRaces && s.selectedRaces.length > 0) {
           tick(t.progressRace);
           const rr = await callAI(cfg, buildRacePrompt(s, worldYaml, s.selectedRaces), 12000);
@@ -519,7 +519,7 @@ function TavoGenerator() {
           if (cr) we.push({ name: "📝跨種族軼事", content: cr[0], keys: [], selective: false });
         }
       } // end needWorld
-
+ 
       const typeMap = { enemy: "仇人", friend: "朋友", family: "家人" };
       for (let i = 0; i < npcSlots.length; i++) {
         const slot = npcSlots[i]; const isCore = coreNpcIds.has(slot.id);
@@ -550,7 +550,7 @@ function TavoGenerator() {
         const kw = s.entryMode === "auto" && !isCore;
         we.push({ name: `${isCore ? "👤" : "👥"}${nName}`, content: nContent, keys: kw ? [nName] : [], selective: kw });
       }
-
+ 
       let firstMes;
       if (skipFirst) {
         firstMes = lang === "en" ? "【Custom Opening】" : lang === "zh-CN" ? "【自定义开场白】" : "【自定義開場白】";
@@ -558,7 +558,7 @@ function TavoGenerator() {
         tick(t.progressFirst);
         firstMes = await callAI(cfg, buildFirstMesPrompt(s, charContent, worldYaml));
       }
-
+ 
       tick(t.progressAssemble);
       const tone = [...s.toneTags, ...s.customToneTags].join("、") || "自由發揮";
       setResult(assemble(eName, charContent, firstMes, we, tone));
@@ -566,10 +566,10 @@ function TavoGenerator() {
     } catch (e) { setError(e.message || t.errorApi); }
     finally { setGenerating(false); }
   }, [lang, charName, charGender, customGenderText, charAge, charRace, customRaceText, personalityTags, customPersonalityTags, backgroundMode, backgroundText, hasRomance, romanceDetails, specialMechanisms, charExtra, userRelationship, customRelationship, worldStyleTags, customWorldTags, namingStyle, customNamingText, countryCount, cityCount, includeRaces, selectedRaces, toneTags, customToneTags, firstMesMode, firstMesText, entryMode, apiProvider, apiKey, model, customEndpoint, corsMode, corsProxy, npcSlots, coreNpcIds, npcNames, t]);
-
+ 
   const [copied, setCopied] = useState(false);
   const [showFaq, setShowFaq] = useState(false);
-
+ 
   const copyJSON = () => {
     if (!result) return;
     const text = JSON.stringify(result, null, 2);
@@ -584,7 +584,7 @@ function TavoGenerator() {
       document.body.removeChild(ta);
     }
   };
-
+ 
   const downloadJSON = () => {
     if (!result) return;
     const text = JSON.stringify(result, null, 2);
@@ -600,7 +600,7 @@ function TavoGenerator() {
       copyJSON();
     }
   };
-
+ 
   /* ══════ CSS ══════ */
   const css = `
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400&display=swap');
@@ -687,13 +687,13 @@ select.tg-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
 .tg-faq-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
 .tg-faq-q{font-size:13px;font-weight:600;color:var(--t);margin-bottom:6px}
 .tg-faq-a{font-size:13px;color:var(--t2);line-height:1.7}`;
-
+ 
   const pModels = PROVIDERS[apiProvider]?.models || [];
-
+ 
   const stepContent = (idx, children) => (
     <div style={{ display: step === idx ? "block" : "none" }}>{children}</div>
   );
-
+ 
   return (<div className="tg-root"><style>{css}</style>
     <div className="tg-hdr"><div className="tg-hdr-in">
       <div className="tg-title"><span className="tg-dot">◆</span>{t.title}</div>
@@ -779,7 +779,7 @@ select.tg-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
       </div>
       {step < 6 && <div className="tg-nav"><button onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0} className="tg-btn" style={{ padding: "8px 20px", opacity: step === 0 ? .3 : 1 }}>{t.back}</button><button onClick={() => setStep(Math.min(6, step + 1))} className="tg-btn tg-btn-p" style={{ padding: "8px 20px" }}>{t.next}</button></div>}
     </div>
-
+ 
     {/* 使用說明 */}
     <div className="tg-guide">
       <div className="tg-guide-inner">
@@ -831,10 +831,10 @@ select.tg-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
         </div>)}
       </div>
     </div>
-
+ 
     {/* FAQ 浮動按鈕 */}
     <button className="tg-faq-btn" onClick={() => setShowFaq(true)} title="常見問題">?</button>
-
+ 
     {/* FAQ 彈窗 */}
     {showFaq && <div className="tg-overlay" onClick={e => { if(e.target === e.currentTarget) setShowFaq(false); }}>
       <div className="tg-faq-modal">
@@ -869,8 +869,8 @@ select.tg-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
     </div>}
   </div>);
 }
-
-
+ 
+ 
 const container = document.getElementById('root');
 const root = ReactDOM.createRoot(container);
 root.render(React.createElement(TavoGenerator));
