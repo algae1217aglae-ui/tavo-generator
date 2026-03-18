@@ -45,8 +45,10 @@ const T = {
     worldRaceTags: ["吸血鬼", "狼人", "精靈", "矮人", "鬼", "狐狸精", "天狗", "雪女", "龍族", "惡魔", "天使", "獸人", "巨人", "妖精", "不死族"],
     npcTitle: "NPC 設定", enemies: "仇人", friends: "朋友", family: "家人",
     father: "父親", mother: "母親", brother: "兄弟", sister: "姐妹",
+    elderBrother: "哥哥", youngerBrother: "弟弟", elderSister: "姐姐", youngerSister: "妹妹",
+    addSibling: "+ 新增兄弟姊妹", siblingName: "名字（選填，留空讓 AI 自由發揮）", removeSibling: "移除",
     maleCount: "男", femaleCount: "女", npcPreview: "NPC 預覽 — 點擊勾選核心角色",
-    coreLabel: "核心", simpleLabel: "簡略", noNpc: "尚未新增任何 NPC",
+    coreLabel: "核心", simpleLabel: "簡略", noNpc: "尚未新增任何 NPC", npcNamePh: "名字（選填）",
     toneTitle: "敘事基調",
     toneTags: ["沉重", "輕鬆", "黑暗", "溫暖", "懸疑", "浪漫", "詼諧", "悲壯", "日常", "冒險", "荒誕", "治癒", "緊張", "哲學"],
     customTonePh: "自訂基調標籤（Enter 新增）",
@@ -92,8 +94,10 @@ const T = {
     worldRaceTags: ["吸血鬼", "狼人", "精灵", "矮人", "鬼", "狐狸精", "天狗", "雪女", "龙族", "恶魔", "天使", "兽人", "巨人", "妖精", "不死族"],
     npcTitle: "NPC 设定", enemies: "仇人", friends: "朋友", family: "家人",
     father: "父亲", mother: "母亲", brother: "兄弟", sister: "姐妹",
+    elderBrother: "哥哥", youngerBrother: "弟弟", elderSister: "姐姐", youngerSister: "妹妹",
+    addSibling: "+ 新增兄弟姊妹", siblingName: "名字（选填，留空让 AI 自由发挥）", removeSibling: "移除",
     maleCount: "男", femaleCount: "女", npcPreview: "NPC 预览 — 点击勾选核心角色",
-    coreLabel: "核心", simpleLabel: "简略", noNpc: "尚未新增任何 NPC",
+    coreLabel: "核心", simpleLabel: "简略", noNpc: "尚未新增任何 NPC", npcNamePh: "名字（选填）",
     toneTitle: "叙事基调",
     toneTags: ["沉重", "轻松", "黑暗", "温暖", "悬疑", "浪漫", "诙谐", "悲壮", "日常", "冒险", "荒诞", "治愈", "紧张", "哲学"],
     customTonePh: "自定义基调标签（Enter 新增）",
@@ -139,8 +143,10 @@ const T = {
     worldRaceTags: ["Vampire", "Werewolf", "Elf", "Dwarf", "Ghost", "Fox Spirit", "Tengu", "Yuki-onna", "Dragon", "Demon", "Angel", "Orc", "Giant", "Fairy", "Undead"],
     npcTitle: "NPCs", enemies: "Enemies", friends: "Friends", family: "Family",
     father: "Father", mother: "Mother", brother: "Brothers", sister: "Sisters",
+    elderBrother: "Elder Brother", youngerBrother: "Younger Brother", elderSister: "Elder Sister", youngerSister: "Younger Sister",
+    addSibling: "+ Add Sibling", siblingName: "Name (optional — leave blank for AI)", removeSibling: "Remove",
     maleCount: "M", femaleCount: "F", npcPreview: "NPC Preview — click to mark core",
-    coreLabel: "Core", simpleLabel: "Simple", noNpc: "No NPCs yet",
+    coreLabel: "Core", simpleLabel: "Simple", noNpc: "No NPCs yet", npcNamePh: "Name (optional)",
     toneTitle: "Tone",
     toneTags: ["Heavy", "Light", "Dark", "Warm", "Suspenseful", "Romantic", "Humorous", "Tragic", "Slice of Life", "Adventure", "Absurd", "Healing", "Tense", "Philosophical"],
     customTonePh: "Custom tone (Enter)",
@@ -414,9 +420,9 @@ function TavoGenerator() {
   const [friendFemale, setFriendFemale] = useState(0);
   const [hasFather, setHasFather] = useState(false);
   const [hasMother, setHasMother] = useState(false);
-  const [brotherCount, setBrotherCount] = useState(0);
-  const [sisterCount, setSisterCount] = useState(0);
+  const [siblings, setSiblings] = useState([]);
   const [coreNpcIds, setCoreNpcIds] = useState(new Set());
+  const [npcNames, setNpcNames] = useState({});
 
   const [toneTags, setToneTags] = useState([]);
   const [customToneTags, setCustomToneTags] = useState([]);
@@ -439,10 +445,17 @@ function TavoGenerator() {
     for (let i = 0; i < friendFemale; i++) s.push({ id: `ff${i}`, type: "friend", gender: "F", label: t.friendF + ` ${i + 1}` });
     if (hasFather) s.push({ id: "father", type: "family", gender: "M", label: t.father });
     if (hasMother) s.push({ id: "mother", type: "family", gender: "F", label: t.mother });
-    for (let i = 0; i < brotherCount; i++) s.push({ id: `bro${i}`, type: "family", gender: "M", label: t.brother + ` ${i + 1}` });
-    for (let i = 0; i < sisterCount; i++) s.push({ id: `sis${i}`, type: "family", gender: "F", label: t.sister + ` ${i + 1}` });
+    const roleCount = {};
+    siblings.forEach(sib => {
+      const roleLabel = { elder_brother: t.elderBrother, younger_brother: t.youngerBrother, elder_sister: t.elderSister, younger_sister: t.youngerSister }[sib.role] || sib.role;
+      const gender = sib.role.includes("sister") ? "F" : "M";
+      roleCount[sib.role] = (roleCount[sib.role] || 0) + 1;
+      const num = roleCount[sib.role];
+      const numLabel = `${roleLabel} ${num}`;
+      s.push({ id: sib.id, type: "family", gender, label: sib.name ? `${numLabel}（${sib.name}）` : numLabel, sibName: sib.name, role: sib.role });
+    });
     return s;
-  }, [enemyMale, enemyFemale, friendMale, friendFemale, hasFather, hasMother, brotherCount, sisterCount, t]);
+  }, [enemyMale, enemyFemale, friendMale, friendFemale, hasFather, hasMother, siblings, t]);
 
   const togglePersonality = useCallback(tag => setPersonalityTags(p => p.includes(tag)?p.filter(x=>x!==tag):[...p,tag]), []);
   const addCustomP = useCallback(tag => setCustomPersonalityTags(p=>[...p,tag]), []);
@@ -509,7 +522,12 @@ function TavoGenerator() {
       for (let i = 0; i < npcSlots.length; i++) {
         const slot = npcSlots[i]; const isCore = coreNpcIds.has(slot.id);
         tick(`${t.progressNpc} — ${slot.label}`);
-        const spec = slot.type === "family" ? slot.label : `${typeMap[slot.type]}，${slot.gender === "M" ? "男性" : "女性"}`;
+        const roleMap = { elder_brother: "哥哥", younger_brother: "弟弟", elder_sister: "姐姐", younger_sister: "妹妹" };
+        const overrideName = npcNames[slot.id] || "";
+        const sibLabel = slot.role && roleMap[slot.role] ? `${roleMap[slot.role]}${(overrideName || slot.sibName) ? `，名字：${overrideName || slot.sibName}` : "（名字由 AI 自由發揮）"}` : slot.label;
+        const friendEnemyLabel = `${typeMap[slot.type]}，${slot.gender === "M" ? "男性" : "女性"}${overrideName ? `，名字：${overrideName}` : "（名字由 AI 自由發揮）"}`;
+        const familyBasicLabel = slot.label + (overrideName ? `（${overrideName}）` : "（名字由 AI 自由發揮）");
+        const spec = slot.type === "family" ? (slot.role ? sibLabel : familyBasicLabel) : friendEnemyLabel;
         const nr = await callAI(cfg, buildNpcPrompt(s, worldYaml, charContent, typeMap[slot.type], spec, isCore));
         const nrClean = nr.replace(/^```(?:yaml)?\n?/m, "").replace(/\n?```\s*$/m, "").trim();
         const nm = nrClean.match(/<character_info:([^>]+)>([\s\S]*?)<\/character_info:\1>/);
@@ -545,7 +563,7 @@ function TavoGenerator() {
       setProgress(t.progressDone); setProgressPct(100);
     } catch (e) { setError(e.message || t.errorApi); }
     finally { setGenerating(false); }
-  }, [lang, charName, charGender, customGenderText, charAge, charRace, customRaceText, personalityTags, customPersonalityTags, backgroundMode, backgroundText, hasRomance, romanceDetails, specialMechanisms, charExtra, userRelationship, customRelationship, worldStyleTags, customWorldTags, namingStyle, customNamingText, countryCount, cityCount, includeRaces, selectedRaces, toneTags, customToneTags, firstMesMode, firstMesText, entryMode, apiProvider, apiKey, model, customEndpoint, corsMode, corsProxy, npcSlots, coreNpcIds, t]);
+  }, [lang, charName, charGender, customGenderText, charAge, charRace, customRaceText, personalityTags, customPersonalityTags, backgroundMode, backgroundText, hasRomance, romanceDetails, specialMechanisms, charExtra, userRelationship, customRelationship, worldStyleTags, customWorldTags, namingStyle, customNamingText, countryCount, cityCount, includeRaces, selectedRaces, toneTags, customToneTags, firstMesMode, firstMesText, entryMode, apiProvider, apiKey, model, customEndpoint, corsMode, corsProxy, npcSlots, coreNpcIds, npcNames, t]);
 
   const [copied, setCopied] = useState(false);
   const [showFaq, setShowFaq] = useState(false);
@@ -734,8 +752,8 @@ select.tg-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
           <p className="tg-note tg-note-warn" style={{marginBottom:12}}>{t.npcNote}</p>
           <Section title={t.enemies}><div className="tg-row"><NumInput value={enemyMale} onChange={setEnemyMale} label={t.maleCount} /><NumInput value={enemyFemale} onChange={setEnemyFemale} label={t.femaleCount} /></div></Section>
           <Section title={t.friends}><div className="tg-row"><NumInput value={friendMale} onChange={setFriendMale} label={t.maleCount} /><NumInput value={friendFemale} onChange={setFriendFemale} label={t.femaleCount} /></div></Section>
-          <Section title={t.family}><div className="tg-row tg-mb"><Toggle checked={hasFather} onChange={setHasFather} label={t.father} /><Toggle checked={hasMother} onChange={setHasMother} label={t.mother} /></div><div className="tg-row"><NumInput value={brotherCount} onChange={setBrotherCount} label={t.brother} max={5} /><NumInput value={sisterCount} onChange={setSisterCount} label={t.sister} max={5} /></div></Section>
-          <Section title={t.npcPreview}>{npcSlots.length === 0 ? <p style={{ color: "var(--t3)", fontSize: 13 }}>{t.noNpc}</p> : <div className="tg-npc-list">{npcSlots.map(slot => { const c = coreNpcIds.has(slot.id); return (<div key={slot.id} className={`tg-npc ${c ? "core" : ""}`} onClick={() => toggleCore(slot.id)}><div className="tg-npc-ck">{c ? "✓" : ""}</div><span className="tg-npc-nm">{slot.label}</span><span className={`tg-badge ${c ? "tg-badge-c" : "tg-badge-s"}`}>{c ? t.coreLabel : t.simpleLabel}</span></div>); })}</div>}</Section>
+          <Section title={t.family}><div className="tg-row tg-mb"><Toggle checked={hasFather} onChange={setHasFather} label={t.father} /><Toggle checked={hasMother} onChange={setHasMother} label={t.mother} /></div><div className="tg-row tg-mb" style={{flexWrap:"wrap"}}>{[["elder_brother",t.elderBrother],["younger_brother",t.youngerBrother],["elder_sister",t.elderSister],["younger_sister",t.youngerSister]].map(([role,label]) => (<button key={role} onClick={() => setSiblings(p => [...p, {id:`sib_${Date.now()}_${Math.random()}`,role,name:""}])} className="tg-btn" style={{fontSize:12}}>{label} +</button>))}</div>{siblings.length > 0 && <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:4}}>{(() => { const rc = {}; return siblings.map((sib,idx) => { const roleLabel = {elder_brother:t.elderBrother,younger_brother:t.youngerBrother,elder_sister:t.elderSister,younger_sister:t.youngerSister}[sib.role]; rc[sib.role] = (rc[sib.role]||0)+1; const numLabel = `${roleLabel} ${rc[sib.role]}`; return (<div key={sib.id} style={{display:"flex",alignItems:"center",gap:6}}><span style={{fontSize:12,color:"var(--ac)",minWidth:44,flexShrink:0}}>{numLabel}</span><input value={sib.name} onChange={e => setSiblings(p => p.map((s,i) => i===idx ? {...s,name:e.target.value} : s))} placeholder={t.siblingName} className="tg-input" style={{fontSize:12}} /><button onClick={() => setSiblings(p => p.filter((_,i) => i!==idx))} className="tg-mhb" style={{flexShrink:0,color:"var(--err)"}}>{t.removeSibling}</button></div>); }); })()}</div>}</Section>
+          <Section title={t.npcPreview}>{npcSlots.length === 0 ? <p style={{ color: "var(--t3)", fontSize: 13 }}>{t.noNpc}</p> : <div className="tg-npc-list">{npcSlots.map(slot => { const c = coreNpcIds.has(slot.id); return (<div key={slot.id} className={`tg-npc ${c ? "core" : ""}`} style={{flexWrap:"wrap",gap:6}}><div className="tg-npc-ck" onClick={() => toggleCore(slot.id)} style={{cursor:"pointer"}}>{c ? "✓" : ""}</div><span className="tg-npc-nm" onClick={() => toggleCore(slot.id)} style={{cursor:"pointer"}}>{slot.label}</span><input value={npcNames[slot.id] || ""} onChange={e => setNpcNames(p => ({...p, [slot.id]: e.target.value}))} onClick={e => e.stopPropagation()} placeholder={t.npcNamePh} className="tg-input" style={{fontSize:11,padding:"3px 8px",width:"auto",flex:1,minWidth:80}} /><span className={`tg-badge ${c ? "tg-badge-c" : "tg-badge-s"}`} onClick={() => toggleCore(slot.id)} style={{cursor:"pointer"}}>{c ? t.coreLabel : t.simpleLabel}</span></div>); })}</div>}</Section>
         </div>)}
         {stepContent(5, <div>
           <Section title={t.toneTitle}><TagSelector tags={t.toneTags} selected={toneTags} onToggle={toggleTone} customTags={customToneTags} onAddCustom={addCustomT} onRemoveCustom={removeCustomT} placeholder={t.customTonePh} /></Section>
